@@ -10,7 +10,6 @@
 <div class="container mt-4">
 
     <form th:action="@{/events}"
-          th:object="${eventForm}"
           method="post">
 
         <input type="hidden" name="clubId" th:value="${clubId}">
