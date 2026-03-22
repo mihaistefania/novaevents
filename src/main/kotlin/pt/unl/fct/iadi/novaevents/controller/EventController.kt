@@ -3,6 +3,7 @@ package pt.unl.fct.iadi.novaevents.controller
 import jakarta.validation.Valid
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
+import org.springframework.ui.ModelMap
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
 import pt.unl.fct.iadi.novaevents.controller.dto.EventForm
@@ -37,13 +38,8 @@ class EventController(
     }
 
     @GetMapping("/{id}")
-    fun eventDetail(@PathVariable id: Long, model: Model): String {
-        val event = eventService.getById(id)
-        val club = clubService.getById(event.clubId)
-
-        model.addAttribute("event", event)
-        model.addAttribute("club", club)
-
+    fun detail(@PathVariable id: Long, model: ModelMap): String {
+        model["event"] = eventService.getById(id)
         return "events/detail"
     }
 
