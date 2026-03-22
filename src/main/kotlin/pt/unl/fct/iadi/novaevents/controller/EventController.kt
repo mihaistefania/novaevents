@@ -160,7 +160,8 @@ class EventController(
         model: Model
     ): String {
 
-        val clubId = eventForm.clubId!!
+        val clubId = eventForm.clubId
+            ?: throw IllegalArgumentException("ClubId missing")
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("types", EventType.values())
