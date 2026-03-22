@@ -155,7 +155,7 @@ class EventController(
 
     @PostMapping("/events")
     fun createEvent(
-        @RequestParam(required = false) clubId: Long?,   // ✅ ADD THIS
+        @RequestParam(required = false) clubId: Long?,
         @Valid @ModelAttribute eventForm: EventForm,
         bindingResult: BindingResult,
         model: Model
@@ -182,7 +182,7 @@ class EventController(
 
         return try {
             eventService.create(event)
-            "redirect:/clubs/$resolvedClubId"
+            "redirect:/clubs/$clubId"
         } catch (e: IllegalArgumentException) {
             bindingResult.rejectValue("name", "error.name", e.message!!)
             model.addAttribute("types", EventType.values())
