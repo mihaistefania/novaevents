@@ -29,13 +29,14 @@ class EventController(
         model: Model
     ): String {
 
-        val parsedType = try {
-            type?.let { EventType.valueOf(it) }
-        } catch (e: Exception) { null }
+        val parsedType = type
+            ?.uppercase()
+            ?.let { EventType.values().find { e -> e.name == it } }
 
         val parsedClubId = clubId?.toLongOrNull()
-        val parsedFrom = from?.let { LocalDate.parse(it) }
-        val parsedTo = to?.let { LocalDate.parse(it) }
+
+        val parsedFrom = try { from?.let { LocalDate.parse(it) } } catch (e: Exception) { null }
+        val parsedTo = try { to?.let { LocalDate.parse(it) } } catch (e: Exception) { null }
 
         val events = eventService.filter(parsedType, parsedClubId, parsedFrom, parsedTo)
 
@@ -45,7 +46,7 @@ class EventController(
         return "events/list"
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id:\\d+}")
     fun detail(@PathVariable id: Long, model: ModelMap): String {
 
         val event = eventService.getById(id)
