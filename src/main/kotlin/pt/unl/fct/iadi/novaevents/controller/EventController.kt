@@ -91,9 +91,17 @@ class EventController(
         )
 
 
-        val created = eventService.create(event)
+        try {
+            eventService.create(event)
+            return "redirect:/clubs/$clubId"
+        } catch (e: IllegalArgumentException) {
+            bindingResult.rejectValue("name", "error.name", e.message!!)
+            model.addAttribute("types", EventType.values())
+            model.addAttribute("clubId", clubId)
+            return "events/form"
+        }
 
-        return "redirect:/events/${created.id}"
+        return "redirect:/clubs/$clubId"
     }
 
     @GetMapping("/events/edit/{id}")
