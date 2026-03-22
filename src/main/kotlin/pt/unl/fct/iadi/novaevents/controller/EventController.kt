@@ -12,6 +12,7 @@ import pt.unl.fct.iadi.novaevents.model.EventType
 import pt.unl.fct.iadi.novaevents.service.ClubService
 import pt.unl.fct.iadi.novaevents.service.EventService
 import java.time.LocalDate
+import org.springframework.format.annotation.DateTimeFormat
 
 @Controller
 @RequestMapping

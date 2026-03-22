@@ -2,8 +2,10 @@ package pt.unl.fct.iadi.novaevents.controller.dto
 
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
+import org.springframework.format.annotation.DateTimeFormat
 import pt.unl.fct.iadi.novaevents.model.EventType
 import java.time.LocalDate
+
 
 data class EventForm(
 
@@ -11,6 +13,7 @@ data class EventForm(
     var name: String? = null,
 
     @field:NotNull(message = "Date is required")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     var date: LocalDate? = null,
 
     var location: String? = null,
