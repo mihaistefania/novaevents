@@ -67,40 +67,7 @@ class EventController(
         return "events/form"
     }
 
-    @PostMapping("/events/create/{clubId}")
-    fun createEvent(
-        @PathVariable clubId: Long,
-        @Valid @ModelAttribute eventForm: EventForm,
-        bindingResult: BindingResult,
-        model: Model
-    ): String {
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("types", EventType.values())
-            model.addAttribute("clubId", clubId)
-            return "events/form"
-        }
 
-        val event = Event(
-            id = 0,
-            clubId = clubId,
-            name = eventForm.name!!,
-            date = eventForm.date!!,
-            location = eventForm.location,
-            type = eventForm.type!!,
-            description = eventForm.description
-        )
-
-        return try {
-            eventService.create(event)
-            "redirect:/clubs/$clubId"
-        } catch (e: IllegalArgumentException) {
-            bindingResult.rejectValue("name", "error.name", e.message!!)
-            model.addAttribute("types", EventType.values())
-            model.addAttribute("clubId", clubId)
-            "events/form"
-        }
-
-    }
 
     @GetMapping("/events/edit/{id}")
     fun showEditForm(@PathVariable id: Long, model: Model): String {
@@ -184,57 +151,34 @@ class EventController(
     @PostMapping("/events")
     fun createEvent(
         @RequestParam clubId: Long,
-        @RequestParam name: String?,
-        @RequestParam date: String?,
-        @RequestParam type: String?,
-        @RequestParam(required = false) location: String?,
-        @RequestParam(required = false) description: String?,
+        @Valid @ModelAttribute eventForm: EventForm,
+        bindingResult: BindingResult,
         model: Model
     ): String {
 
-
-        if (name.isNullOrBlank()) {
-            model.addAttribute("error", "Name is required")
-            return "events/form"
-        }
-
-        val parsedDate = try {
-            date?.let { LocalDate.parse(it) }
-        } catch (e: Exception) {
-            null
-        }
-
-        if (parsedDate == null) {
-            model.addAttribute("error", "Date is required")
-            return "events/form"
-        }
-
-        val parsedType = try {
-            type?.let { EventType.valueOf(it) }
-        } catch (e: Exception) {
-            null
-        }
-
-        if (parsedType == null) {
-            model.addAttribute("error", "Event type is required")
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("types", EventType.values())
+            model.addAttribute("clubId", clubId)
             return "events/form"
         }
 
         val event = Event(
             id = 0,
             clubId = clubId,
-            name = name,
-            date = parsedDate,
-            location = location,
-            type = parsedType,
-            description = description
+            name = eventForm.name!!,
+            date = eventForm.date!!,
+            location = eventForm.location,
+            type = eventForm.type!!,
+            description = eventForm.description
         )
 
         return try {
             eventService.create(event)
             "redirect:/clubs/$clubId"
         } catch (e: IllegalArgumentException) {
-            model.addAttribute("error", e.message)
+            bindingResult.rejectValue("name", "error.name", e.message!!)
+            model.addAttribute("types", EventType.values())
+            model.addAttribute("clubId", clubId)
             "events/form"
         }
     }
