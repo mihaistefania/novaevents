@@ -14,7 +14,7 @@ import pt.unl.fct.iadi.novaevents.service.EventService
 import java.time.LocalDate
 
 @Controller
-@RequestMapping
+@RequestMapping("/")
 class EventController(
     private val eventService: EventService,
     private val clubService: ClubService
@@ -72,7 +72,8 @@ class EventController(
         bindingResult: BindingResult,
         model: Model
     ): String {
-        val clubId = eventForm.clubId!!
+        val clubId = eventForm.clubId
+            ?: throw IllegalArgumentException("Club is required")
         if (bindingResult.hasErrors()) {
             model.addAttribute("types", EventType.values())
             model.addAttribute("clubId", clubId)
@@ -97,7 +98,7 @@ class EventController(
             bindingResult.rejectValue("name", "error.name", e.message!!)
             model.addAttribute("types", EventType.values())
             model.addAttribute("clubId", clubId)
-            return "events/form"
+            "events/form"
         }
 
         return "redirect:/clubs/$clubId"
