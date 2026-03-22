@@ -33,6 +33,8 @@
             <option th:each="t : ${types}" th:value="${t}" th:text="${t}"></option>
         </select>
 
+        <span th:if="${#fields.hasErrors('type')}" th:errors="*{type}"></span>
+
         <br>
 
         <button type="submit">Create</button>

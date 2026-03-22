@@ -124,9 +124,19 @@ class EventController(
             description = eventForm.description
         )
 
-        eventService.update(id, updated)
+        return try {
+            eventService.update(id, updated)
+            "redirect:/clubs/$clubId/events/$id"
+        } catch (e: IllegalArgumentException) {
 
-        return "redirect:/clubs/$clubId"
+            bindingResult.rejectValue("name", "error.name", e.message!!)
+
+            model.addAttribute("types", EventType.values())
+            model.addAttribute("eventId", id)
+            model.addAttribute("clubId", clubId)
+
+            "events/edit-form"
+        }
     }
 
     @GetMapping("/clubs/{clubId}/events/{id}/delete")
@@ -196,8 +206,8 @@ class EventController(
         )
 
         return try {
-            eventService.create(event)
-            "redirect:/clubs/$clubId"
+            var created = eventService.create(event)
+            "redirect:/clubs/$clubId/events/${created.id}"
         } catch (e: IllegalArgumentException) {
             bindingResult.rejectValue("name", "error.name", e.message!!)
             model.addAttribute("types", EventType.values())

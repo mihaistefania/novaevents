@@ -85,35 +85,22 @@
         <tr th:each="event : ${events}">
 
             <td>
-                <a th:href="@{/events/{id}(id=${event.id})}"
-                   th:text="${event.name}">
-                </a>
+                <a th:href="@{/clubs/{clubId}/events/{id}(clubId=${event.clubId}, id=${event.id})}"
+                   th:text="${event.name}"></a>
             </td>
 
-            <td>
-                <span th:each="c : ${clubs}"
-                      th:if="${c.id == event.clubId}"
-                      th:text="${c.name}">
-                </span>
-            </td>
+            <td th:text="${event.clubId}"></td>
 
-            <td th:text="${event.date}"></td>
-
-            <td>
-                <span class="badge bg-secondary"
-                      th:text="${event.type}"></span>
-            </td>
-
-            <td th:text="${event.location} ?: '-'"></td>
+            ...
 
             <td>
                 <a class="btn btn-outline-primary btn-sm"
-                   th:href="@{/events/edit/{id}(id=${event.id})}">
+                   th:href="@{/clubs/{clubId}/events/{id}/edit(clubId=${event.clubId}, id=${event.id})}">
                     Edit
                 </a>
 
                 <a class="btn btn-outline-danger btn-sm"
-                   th:href="@{/events/delete/{id}(id=${event.id})}">
+                   th:href="@{/clubs/{clubId}/events/{id}/delete(clubId=${event.clubId}, id=${event.id})}">
                     Delete
                 </a>
             </td>
