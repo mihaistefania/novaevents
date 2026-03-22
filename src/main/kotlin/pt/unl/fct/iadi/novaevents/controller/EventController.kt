@@ -163,6 +163,10 @@ class EventController(
         val clubId = eventForm.clubId
             ?: throw IllegalArgumentException("ClubId missing")
 
+        if (eventForm.type == null) {
+            bindingResult.rejectValue("type", "error.type", "Event type is required")
+        }
+
         if (bindingResult.hasErrors()) {
             model.addAttribute("types", EventType.values())
             model.addAttribute("clubId", clubId)
@@ -180,8 +184,8 @@ class EventController(
         )
 
         return try {
-            var created = eventService.create(event)
-            return "redirect:/clubs/$clubId"
+            eventService.create(event)
+            "redirect:/clubs/$clubId"
         } catch (e: IllegalArgumentException) {
             bindingResult.rejectValue("name", "error.name", e.message!!)
             model.addAttribute("types", EventType.values())
