@@ -155,27 +155,24 @@ class EventController(
 
     @PostMapping("/events")
     fun createEvent(
+        @RequestParam(required = false) clubId: Long?,   // ✅ ADD THIS
         @Valid @ModelAttribute eventForm: EventForm,
         bindingResult: BindingResult,
         model: Model
     ): String {
 
-        val clubId = eventForm.clubId
-            ?: throw IllegalArgumentException("ClubId missing")
-
-        if (eventForm.type == null) {
-            bindingResult.rejectValue("type", "error.type", "Event type is required")
-        }
+        val resolvedClubId = eventForm.clubId ?: clubId
+        ?: throw IllegalArgumentException("ClubId missing")
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("types", EventType.values())
-            model.addAttribute("clubId", clubId)
+            model.addAttribute("clubId", resolvedClubId)
             return "events/form"
         }
 
         val event = Event(
             id = 0,
-            clubId = clubId,
+            clubId = resolvedClubId,
             name = eventForm.name!!,
             date = eventForm.date!!,
             location = eventForm.location,
@@ -185,11 +182,11 @@ class EventController(
 
         return try {
             eventService.create(event)
-            "redirect:/clubs/$clubId"
+            "redirect:/clubs/$resolvedClubId"
         } catch (e: IllegalArgumentException) {
             bindingResult.rejectValue("name", "error.name", e.message!!)
             model.addAttribute("types", EventType.values())
-            model.addAttribute("clubId", clubId)
+            model.addAttribute("clubId", resolvedClubId)
             "events/form"
         }
     }
