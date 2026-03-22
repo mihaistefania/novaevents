@@ -150,11 +150,12 @@ class EventController(
 
     @PostMapping("/events")
     fun createEvent(
-        @RequestParam clubId: Long,
         @Valid @ModelAttribute eventForm: EventForm,
         bindingResult: BindingResult,
         model: Model
     ): String {
+
+        val clubId = eventForm.clubId!!
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("types", EventType.values())
