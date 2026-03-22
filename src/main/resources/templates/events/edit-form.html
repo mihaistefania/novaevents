@@ -9,8 +9,7 @@
 
 <div class="container mt-4">
 
-    <form th:action="@{/events/edit/{id}(id=${eventId})}"
-          th:object="${eventForm}"
+    <form th:action="@{/clubs/{clubId}/events/{id}(clubId=${clubId}, id=${eventId})}"
           method="post">
 
         <input type="hidden" name="_method" value="put">

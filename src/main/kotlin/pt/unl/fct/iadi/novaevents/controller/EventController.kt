@@ -74,8 +74,12 @@ class EventController(
 
 
 
-    @GetMapping("/events/edit/{id}")
-    fun showEditForm(@PathVariable id: Long, model: Model): String {
+    @GetMapping("/clubs/{clubId}/events/{id}/edit")
+    fun showEditForm(
+        @PathVariable clubId: Long,
+        @PathVariable id: Long,
+        model: Model
+    ): String {
 
         val event = eventService.getById(id)
 
@@ -89,13 +93,15 @@ class EventController(
 
         model.addAttribute("eventForm", form)
         model.addAttribute("eventId", id)
+        model.addAttribute("clubId", clubId)
         model.addAttribute("types", EventType.values())
 
         return "events/edit-form"
     }
 
-    @PutMapping("/events/edit/{id}")
+    @PutMapping("/clubs/{clubId}/events/{id}")
     fun updateEvent(
+        @PathVariable clubId: Long,
         @PathVariable id: Long,
         @Valid @ModelAttribute eventForm: EventForm,
         bindingResult: BindingResult,
@@ -110,7 +116,7 @@ class EventController(
 
         val updated = Event(
             id = id,
-            clubId = eventService.getById(id).clubId,
+            clubId = clubId,
             name = eventForm.name!!,
             date = eventForm.date!!,
             location = eventForm.location,
@@ -120,20 +126,32 @@ class EventController(
 
         eventService.update(id, updated)
 
-        return "redirect:/events/$id"
+        return "redirect:/clubs/$clubId"
     }
 
-    @GetMapping("/events/delete/{id}")
-    fun confirmDelete(@PathVariable id: Long, model: Model): String {
+    @GetMapping("/clubs/{clubId}/events/{id}/delete")
+    fun confirmDelete(
+        @PathVariable clubId: Long,
+        @PathVariable id: Long,
+        model: Model
+    ): String {
+
         val event = eventService.getById(id)
+
         model.addAttribute("event", event)
+        model.addAttribute("clubId", clubId)
+
         return "events/delete"
     }
 
-    @DeleteMapping("/events/delete/{id}")
-    fun deleteEvent(@PathVariable id: Long): String {
-        val clubId = eventService.getById(id).clubId
+    @DeleteMapping("/clubs/{clubId}/events/{id}")
+    fun deleteEvent(
+        @PathVariable clubId: Long,
+        @PathVariable id: Long
+    ): String {
+
         eventService.delete(id)
+
         return "redirect:/clubs/$clubId"
     }
 
@@ -153,26 +171,23 @@ class EventController(
         return "events/detail"
     }
 
-    @PostMapping("/events")
+    @PostMapping("/clubs/{clubId}/events")
     fun createEvent(
-        @RequestParam(required = false) clubId: Long?,
+        @PathVariable clubId: Long,
         @Valid @ModelAttribute eventForm: EventForm,
         bindingResult: BindingResult,
         model: Model
     ): String {
 
-        val resolvedClubId = eventForm.clubId ?: clubId
-        ?: throw IllegalArgumentException("ClubId missing")
-
         if (bindingResult.hasErrors()) {
             model.addAttribute("types", EventType.values())
-            model.addAttribute("clubId", resolvedClubId)
+            model.addAttribute("clubId", clubId)
             return "events/form"
         }
 
         val event = Event(
             id = 0,
-            clubId = resolvedClubId,
+            clubId = clubId,
             name = eventForm.name!!,
             date = eventForm.date!!,
             location = eventForm.location,
@@ -186,7 +201,7 @@ class EventController(
         } catch (e: IllegalArgumentException) {
             bindingResult.rejectValue("name", "error.name", e.message!!)
             model.addAttribute("types", EventType.values())
-            model.addAttribute("clubId", resolvedClubId)
+            model.addAttribute("clubId", clubId)
             "events/form"
         }
     }
