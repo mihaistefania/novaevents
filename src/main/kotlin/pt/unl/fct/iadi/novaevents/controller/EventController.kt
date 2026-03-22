@@ -179,8 +179,8 @@ class EventController(
         )
 
         return try {
-            eventService.create(event)
-            "redirect:/clubs/$clubId"
+            var created = eventService.create(event)
+            return "redirect:/events/${created.id}"
         } catch (e: IllegalArgumentException) {
             bindingResult.rejectValue("name", "error.name", e.message!!)
             model.addAttribute("types", EventType.values())
