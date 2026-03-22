@@ -180,4 +180,39 @@ class EventController(
 
         return "events/detail"
     }
+
+    @PostMapping("/events")
+    fun createEventSimple(
+        @RequestParam clubId: Long,
+        @Valid @ModelAttribute eventForm: EventForm,
+        bindingResult: BindingResult,
+        model: Model
+    ): String {
+
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("types", EventType.values())
+            model.addAttribute("clubId", clubId)
+            return "events/form"
+        }
+
+        val event = Event(
+            id = 0,
+            clubId = clubId,
+            name = eventForm.name!!,
+            date = eventForm.date!!,
+            location = eventForm.location,
+            type = eventForm.type!!,
+            description = eventForm.description
+        )
+
+        return try {
+            eventService.create(event)
+            "redirect:/clubs/$clubId"
+        } catch (e: IllegalArgumentException) {
+            bindingResult.rejectValue("name", "error.name", e.message!!)
+            model.addAttribute("types", EventType.values())
+            model.addAttribute("clubId", clubId)
+            "events/form"
+        }
+    }
 }
