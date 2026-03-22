@@ -85,8 +85,9 @@
         <tr th:each="event : ${events}">
 
             <td>
-                th:href="@{/events/{id}(id=${event.id})}"
-                   th:text="${event.name}"></a>
+                <a th:href="@{/events/{id}(id=${event.id})}"
+                   th:text="${event.name}">
+                </a>
             </td>
 
             <td>
