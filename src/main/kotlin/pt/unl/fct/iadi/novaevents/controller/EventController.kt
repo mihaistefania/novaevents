@@ -66,9 +66,9 @@ class EventController(
         return "events/form"
     }
 
-    @PostMapping("/events/create/{clubId}")
+    @PostMapping("/events")
     fun createEvent(
-        @PathVariable clubId: Long,
+        @RequestParam clubId: Long,
         @Valid @ModelAttribute eventForm: EventForm,
         bindingResult: BindingResult,
         model: Model
