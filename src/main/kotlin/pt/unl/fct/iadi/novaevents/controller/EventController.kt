@@ -14,7 +14,7 @@ import pt.unl.fct.iadi.novaevents.service.EventService
 import java.time.LocalDate
 
 @Controller
-@RequestMapping("/")
+@RequestMapping
 class EventController(
     private val eventService: EventService,
     private val clubService: ClubService
