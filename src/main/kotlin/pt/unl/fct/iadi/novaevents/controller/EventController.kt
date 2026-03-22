@@ -61,9 +61,14 @@ class EventController(
 
     @GetMapping("/events/create/{clubId}")
     fun showCreateForm(@PathVariable clubId: Long, model: Model): String {
-        model.addAttribute("eventForm", EventForm())
+
+        val form = EventForm()
+        form.clubId = clubId
+
+        model.addAttribute("eventForm", form)
         model.addAttribute("clubId", clubId)
         model.addAttribute("types", EventType.values())
+
         return "events/form"
     }
 
