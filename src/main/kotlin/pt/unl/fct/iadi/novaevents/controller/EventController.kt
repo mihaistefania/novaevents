@@ -39,7 +39,13 @@ class EventController(
 
     @GetMapping("/{id}")
     fun detail(@PathVariable id: Long, model: ModelMap): String {
-        model["event"] = eventService.getById(id)
+
+        val event = eventService.getById(id)
+        val club = clubService.getById(event.clubId)
+
+        model["event"] = event
+        model["club"] = club
+
         return "events/detail"
     }
 
