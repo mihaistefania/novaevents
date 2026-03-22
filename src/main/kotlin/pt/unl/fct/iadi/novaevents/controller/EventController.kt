@@ -46,7 +46,7 @@ class EventController(
         return "events/list"
     }
 
-    @GetMapping("/{id:\\d+}")
+    @GetMapping("/{id}")
     fun detail(@PathVariable id: Long, model: ModelMap): String {
 
         val event = eventService.getById(id)
