@@ -14,7 +14,7 @@ import pt.unl.fct.iadi.novaevents.service.EventService
 import java.time.LocalDate
 
 @Controller
-@RequestMapping
+@RequestMapping("/events")
 class EventController(
     private val eventService: EventService,
     private val clubService: ClubService
@@ -22,14 +22,22 @@ class EventController(
 
     @GetMapping
     fun listEvents(
-        @RequestParam(required = false) type: EventType?,
-        @RequestParam(required = false) clubId: Long?,
-        @RequestParam(required = false) from: LocalDate?,
-        @RequestParam(required = false) to: LocalDate?,
+        @RequestParam(required = false) type: String?,
+        @RequestParam(required = false) clubId: String?,
+        @RequestParam(required = false) from: String?,
+        @RequestParam(required = false) to: String?,
         model: Model
     ): String {
 
-        val events = eventService.filter(type, clubId, from, to)
+        val parsedType = try {
+            type?.let { EventType.valueOf(it) }
+        } catch (e: Exception) { null }
+
+        val parsedClubId = clubId?.toLongOrNull()
+        val parsedFrom = from?.let { LocalDate.parse(it) }
+        val parsedTo = to?.let { LocalDate.parse(it) }
+
+        val events = eventService.filter(parsedType, parsedClubId, parsedFrom, parsedTo)
 
         model.addAttribute("events", events)
         model.addAttribute("clubs", clubService.getAll())
