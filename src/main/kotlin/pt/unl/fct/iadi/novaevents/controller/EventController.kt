@@ -147,20 +147,4 @@ class EventController(
         eventService.delete(id)
         return "redirect:/clubs/$clubId"
     }
-
-    @GetMapping("/clubs/{clubId}/events/{eventId}")
-    fun eventDetailWithClub(
-        @PathVariable clubId: Long,
-        @PathVariable eventId: Long,
-        model: Model
-    ): String {
-
-        val event = eventService.getById(eventId)
-        val club = clubService.getById(clubId)
-
-        model.addAttribute("event", event)
-        model.addAttribute("club", club)
-
-        return "events/detail"
-    }
 }

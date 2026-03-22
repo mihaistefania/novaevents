@@ -31,7 +31,7 @@
         <tbody>
         <tr th:each="event : ${events}">
             <td>
-                <a th:href="@{/clubs/{clubId}/events/{eventId}(clubId=${event.clubId}, eventId=${event.id})}"
+                <a th:href="@{/events/{id}(id=${event.id})}"
                    th:text="${event.name}"></a>
             </td>
             <td th:text="${event.date}"></td>
