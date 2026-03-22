@@ -182,36 +182,59 @@ class EventController(
     }
 
     @PostMapping("/events")
-    fun createEventSimple(
+    fun createEvent(
         @RequestParam clubId: Long,
-        @Valid @ModelAttribute eventForm: EventForm,
-        bindingResult: BindingResult,
+        @RequestParam name: String?,
+        @RequestParam date: String?,
+        @RequestParam type: String?,
+        @RequestParam(required = false) location: String?,
+        @RequestParam(required = false) description: String?,
         model: Model
     ): String {
 
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("types", EventType.values())
-            model.addAttribute("clubId", clubId)
+
+        if (name.isNullOrBlank()) {
+            model.addAttribute("error", "Name is required")
+            return "events/form"
+        }
+
+        val parsedDate = try {
+            date?.let { LocalDate.parse(it) }
+        } catch (e: Exception) {
+            null
+        }
+
+        if (parsedDate == null) {
+            model.addAttribute("error", "Date is required")
+            return "events/form"
+        }
+
+        val parsedType = try {
+            type?.let { EventType.valueOf(it) }
+        } catch (e: Exception) {
+            null
+        }
+
+        if (parsedType == null) {
+            model.addAttribute("error", "Event type is required")
             return "events/form"
         }
 
         val event = Event(
             id = 0,
             clubId = clubId,
-            name = eventForm.name!!,
-            date = eventForm.date!!,
-            location = eventForm.location,
-            type = eventForm.type!!,
-            description = eventForm.description
+            name = name,
+            date = parsedDate,
+            location = location,
+            type = parsedType,
+            description = description
         )
 
         return try {
             eventService.create(event)
             "redirect:/clubs/$clubId"
         } catch (e: IllegalArgumentException) {
-            bindingResult.rejectValue("name", "error.name", e.message!!)
-            model.addAttribute("types", EventType.values())
-            model.addAttribute("clubId", clubId)
+            model.addAttribute("error", e.message)
             "events/form"
         }
     }
