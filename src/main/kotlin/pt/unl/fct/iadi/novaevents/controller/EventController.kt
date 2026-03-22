@@ -14,7 +14,7 @@ import pt.unl.fct.iadi.novaevents.service.EventService
 import java.time.LocalDate
 
 @Controller
-@RequestMapping("/events")
+@RequestMapping
 class EventController(
     private val eventService: EventService,
     private val clubService: ClubService
@@ -157,5 +157,21 @@ class EventController(
         val clubId = eventService.getById(id).clubId
         eventService.delete(id)
         return "redirect:/clubs/$clubId"
+    }
+
+    @GetMapping("/clubs/{clubId}/events/{eventId}")
+    fun detailWithClub(
+        @PathVariable clubId: Long,
+        @PathVariable eventId: Long,
+        model: ModelMap
+    ): String {
+
+        val event = eventService.getById(eventId)
+        val club = clubService.getById(clubId)
+
+        model["event"] = event
+        model["club"] = club
+
+        return "events/detail"
     }
 }
