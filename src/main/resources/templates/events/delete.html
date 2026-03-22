@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<div th:replace="layout/navbar :: navbar"></div>
+
+<div class="container mt-4">
+
+    <h2>Delete Event</h2>
+
+    <p>Are you sure you want to delete the following event?</p>
+
+    <ul>
+        <li><strong>Name:</strong> <span th:text="${event.name}"></span></li>
+        <li><strong>Date:</strong> <span th:text="${event.date}"></span></li>
+        <li><strong>Type:</strong> <span th:text="${event.type}"></span></li>
+        <li><strong>Location:</strong> <span th:text="${event.location}"></span></li>
+    </ul>
+
+    <form th:action="@{/events/delete/{id}(id=${event.id})}" method="post">
+
+        <input type="hidden" name="_method" value="delete">
+        <button class="btn btn-danger">Yes, Delete</button>
+    </form>
+
+</div>
+</body>
+</html>

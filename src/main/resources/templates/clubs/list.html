@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Clubs</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div th:replace="layout/navbar :: navbar"></div>
+
+<div class="container mt-4">
+
+    <h2>Campus Clubs</h2>
+
+    <table class="table table-striped table-bordered">
+        <thead class="table-dark">
+        <tr>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Description</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="club : ${clubs}">
+
+            <td th:text="${club.name}"></td>
+
+            <td>
+                <span class="badge"
+                      th:classappend="
+                        ${club.category.name() == 'TECHNOLOGY'} ? 'bg-primary' :
+                        (${club.category.name() == 'ARTS'} ? 'bg-warning text-dark' :
+                        (${club.category.name() == 'SPORTS'} ? 'bg-success' :
+                        (${club.category.name() == 'ACADEMIC'} ? 'bg-info text-dark' :
+                        (${club.category.name() == 'CULTURAL'} ? 'bg-secondary' :
+                        'bg-dark'))))"
+                      th:text="${club.category}">
+                </span>
+            </td>
+
+            <td>
+                <details>
+                    <summary>View</summary>
+                    <span th:text="${club.description}"></span>
+                </details>
+            </td>
+
+            <td>
+                <a class="btn btn-outline-primary btn-sm"
+                   th:href="@{/clubs/{id}(id=${club.id})}">
+                    View Details
+                </a>
+            </td>
+
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Create Event</title>
+</head>
+<body>
+
+<div th:replace="layout/navbar :: navbar"></div>
+
+<div class="container mt-4">
+
+    <form th:action="@{/events/edit/{id}(id=${eventId})}"
+          th:object="${eventForm}"
+          method="post">
+
+        <input type="hidden" name="_method" value="put">
+
+        Name:
+        <input type="text" th:field="*{name}"/>
+        <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+
+        <br>
+
+        Date:
+        <input type="date" th:field="*{date}"/>
+        <span th:if="${#fields.hasErrors('date')}" th:errors="*{date}"></span>
+
+        <br>
+
+        Type:
+        <select th:field="*{type}">
+            <option th:each="t : ${types}" th:value="${t}" th:text="${t}"></option>
+        </select>
+        <span th:errors="*{type}"></span>
+
+        <br>
+
+        Location:
+        <input type="text" th:field="*{location}"/>
+
+        <br>
+
+        Description:
+        <textarea th:field="*{description}"></textarea>
+
+        <br>
+
+        <button type="submit">Create</button>
+
+    </form>
+
+</div>
+
+</body>
+</html>
