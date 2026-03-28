@@ -12,6 +12,8 @@ import pt.unl.fct.iadi.novaevents.repository.EventTypeRepository
 import pt.unl.fct.iadi.novaevents.service.ClubService
 import pt.unl.fct.iadi.novaevents.service.EventService
 import java.time.LocalDate
+import org.springframework.http.HttpStatus
+import org.springframework.web.server.ResponseStatusException
 
 @Controller
 class EventController(
@@ -52,7 +54,11 @@ class EventController(
     @GetMapping("/events/{id}")
     fun detail(@PathVariable id: Long, model: ModelMap): String {
 
-        val event = eventService.getById(id)
+        val event = try {
+            eventService.getById(id)
+        } catch (e: NoSuchElementException) {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND)
+        }
 
         model["event"] = event
         model["club"] = event.club
@@ -172,5 +178,23 @@ class EventController(
         eventService.delete(id)
 
         return "redirect:/clubs/$clubId"
+    }
+    @GetMapping("/clubs/{clubId}/events/{id}")
+    fun detailFromClub(
+        @PathVariable clubId: Long,
+        @PathVariable id: Long,
+        model: Model
+    ): String {
+
+        val event = try {
+            eventService.getById(id)
+        } catch (e: NoSuchElementException) {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND)
+        }
+
+        model.addAttribute("event", event)
+        model.addAttribute("club", event.club)
+
+        return "events/detail"
     }
 }
