@@ -21,4 +21,7 @@ class ClubService(
             Pair(club, count)
         }
     }
+    fun findByIdOrNull(id: Long): Club? {
+        return clubRepository.findById(id).orElse(null)
+    }
 }

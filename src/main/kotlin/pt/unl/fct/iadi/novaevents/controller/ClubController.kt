@@ -33,7 +33,9 @@ class ClubController(
 
     @GetMapping("/{id}")
     fun clubDetail(@PathVariable id: Long, model: Model): String {
-        val club = clubService.findById(id)
+
+        val club = clubService.findByIdOrNull(id)
+            ?: return "error/404"
 
         val events = eventService.filter(
             type = null,
