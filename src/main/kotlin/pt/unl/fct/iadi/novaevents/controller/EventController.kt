@@ -8,19 +8,19 @@ import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
 import pt.unl.fct.iadi.novaevents.controller.dto.EventForm
 import pt.unl.fct.iadi.novaevents.model.Event
-import pt.unl.fct.iadi.novaevents.model.EventType
+import pt.unl.fct.iadi.novaevents.repository.EventTypeRepository
 import pt.unl.fct.iadi.novaevents.service.ClubService
 import pt.unl.fct.iadi.novaevents.service.EventService
 import java.time.LocalDate
-import org.springframework.format.annotation.DateTimeFormat
 
 @Controller
-@RequestMapping
 class EventController(
     private val eventService: EventService,
-    private val clubService: ClubService
+    private val clubService: ClubService,
+    private val eventTypeRepository: EventTypeRepository
 ) {
 
+    // -------- LIST --------
     @GetMapping("/events")
     fun listEvents(
         @RequestParam(required = false) type: String?,
@@ -30,35 +30,39 @@ class EventController(
         model: Model
     ): String {
 
-        val parsedType = type
-            ?.uppercase()
-            ?.let { EventType.values().find { e -> e.name == it } }
+        val parsedType = type?.let {
+            eventTypeRepository.findAll().find { t ->
+                t.name.equals(it, ignoreCase = true)
+            }
+        }
 
         val parsedClubId = clubId?.toLongOrNull()
 
-        val parsedFrom = try { from?.let { LocalDate.parse(it) } } catch (e: Exception) { null }
-        val parsedTo = try { to?.let { LocalDate.parse(it) } } catch (e: Exception) { null }
+        val parsedFrom = try { from?.let { LocalDate.parse(it) } } catch (_: Exception) { null }
+        val parsedTo = try { to?.let { LocalDate.parse(it) } } catch (_: Exception) { null }
 
         val events = eventService.filter(parsedType, parsedClubId, parsedFrom, parsedTo)
 
         model.addAttribute("events", events)
-        model.addAttribute("clubs", clubService.getAll())
+        model.addAttribute("clubs", clubService.findAll())
+        model.addAttribute("types", eventTypeRepository.findAll())
 
         return "events/list"
     }
 
+    // -------- DETAIL --------
     @GetMapping("/events/{id}")
     fun detail(@PathVariable id: Long, model: ModelMap): String {
 
         val event = eventService.getById(id)
-        val club = clubService.getById(event.clubId)
 
         model["event"] = event
-        model["club"] = club
+        model["club"] = event.club
 
         return "events/detail"
     }
 
+    // -------- CREATE FORM --------
     @GetMapping("/events/create/{clubId}")
     fun showCreateForm(@PathVariable clubId: Long, model: Model): String {
 
@@ -67,13 +71,45 @@ class EventController(
 
         model.addAttribute("eventForm", form)
         model.addAttribute("clubId", clubId)
-        model.addAttribute("types", EventType.values())
+        model.addAttribute("types", eventTypeRepository.findAll())
 
         return "events/form"
     }
 
+    // -------- CREATE --------
+    @PostMapping("/clubs/{clubId}/events")
+    fun createEvent(
+        @PathVariable clubId: Long,
+        @Valid @ModelAttribute eventForm: EventForm,
+        bindingResult: BindingResult,
+        model: Model
+    ): String {
 
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("types", eventTypeRepository.findAll())
+            model.addAttribute("clubId", clubId)
+            return "events/form"
+        }
 
+        val club = clubService.findById(clubId)
+        val type = eventTypeRepository.findById(eventForm.typeId!!).orElseThrow()
+
+        val event = Event(
+            id = 0,
+            name = eventForm.name!!,
+            date = eventForm.date!!,
+            location = eventForm.location,
+            description = eventForm.description,
+            club = club,
+            type = type
+        )
+
+        val created = eventService.create(event)
+
+        return "redirect:/events/${created.id}"
+    }
+
+    // -------- EDIT FORM --------
     @GetMapping("/clubs/{clubId}/events/{id}/edit")
     fun showEditForm(
         @PathVariable clubId: Long,
@@ -87,18 +123,19 @@ class EventController(
             name = event.name,
             date = event.date,
             location = event.location,
-            type = event.type,
+            typeId = event.type.id,
             description = event.description
         )
 
         model.addAttribute("eventForm", form)
         model.addAttribute("eventId", id)
         model.addAttribute("clubId", clubId)
-        model.addAttribute("types", EventType.values())
+        model.addAttribute("types", eventTypeRepository.findAll())
 
         return "events/edit-form"
     }
 
+    // -------- UPDATE --------
     @PutMapping("/clubs/{clubId}/events/{id}")
     fun updateEvent(
         @PathVariable clubId: Long,
@@ -109,51 +146,30 @@ class EventController(
     ): String {
 
         if (bindingResult.hasErrors()) {
-            model.addAttribute("types", EventType.values())
+            model.addAttribute("types", eventTypeRepository.findAll())
             model.addAttribute("eventId", id)
             return "events/edit-form"
         }
 
+        val club = clubService.findById(clubId)
+        val type = eventTypeRepository.findById(eventForm.typeId!!).orElseThrow()
+
         val updated = Event(
             id = id,
-            clubId = clubId,
             name = eventForm.name!!,
             date = eventForm.date!!,
             location = eventForm.location,
-            type = eventForm.type!!,
-            description = eventForm.description
+            description = eventForm.description,
+            club = club,
+            type = type
         )
 
-        return try {
-            eventService.update(id, updated)
-            "redirect:/clubs/$clubId/events/$id"
-        } catch (e: IllegalArgumentException) {
+        eventService.update(id, updated)
 
-            bindingResult.rejectValue("name", "error.name", e.message!!)
-
-            model.addAttribute("types", EventType.values())
-            model.addAttribute("eventId", id)
-            model.addAttribute("clubId", clubId)
-
-            "events/edit-form"
-        }
+        return "redirect:/events/$id"
     }
 
-    @GetMapping("/clubs/{clubId}/events/{id}/delete")
-    fun confirmDelete(
-        @PathVariable clubId: Long,
-        @PathVariable id: Long,
-        model: Model
-    ): String {
-
-        val event = eventService.getById(id)
-
-        model.addAttribute("event", event)
-        model.addAttribute("clubId", clubId)
-
-        return "events/delete"
-    }
-
+    // -------- DELETE --------
     @DeleteMapping("/clubs/{clubId}/events/{id}")
     fun deleteEvent(
         @PathVariable clubId: Long,
@@ -163,56 +179,5 @@ class EventController(
         eventService.delete(id)
 
         return "redirect:/clubs/$clubId"
-    }
-
-    @GetMapping("/clubs/{clubId}/events/{eventId}")
-    fun detailWithClub(
-        @PathVariable clubId: Long,
-        @PathVariable eventId: Long,
-        model: ModelMap
-    ): String {
-
-        val event = eventService.getById(eventId)
-        val club = clubService.getById(clubId)
-
-        model["event"] = event
-        model["club"] = club
-
-        return "events/detail"
-    }
-
-    @PostMapping("/clubs/{clubId}/events")
-    fun createEvent(
-        @PathVariable clubId: Long,
-        @Valid @ModelAttribute eventForm: EventForm,
-        bindingResult: BindingResult,
-        model: Model
-    ): String {
-
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("types", EventType.values())
-            model.addAttribute("clubId", clubId)
-            return "events/form"
-        }
-
-        val event = Event(
-            id = 0,
-            clubId = clubId,
-            name = eventForm.name!!,
-            date = eventForm.date!!,
-            location = eventForm.location,
-            type = eventForm.type!!,
-            description = eventForm.description
-        )
-
-        return try {
-            var created = eventService.create(event)
-            "redirect:/clubs/$clubId/events/${created.id}"
-        } catch (e: IllegalArgumentException) {
-            bindingResult.rejectValue("name", "error.name", e.message!!)
-            model.addAttribute("types", EventType.values())
-            model.addAttribute("clubId", clubId)
-            "events/form"
-        }
     }
 }

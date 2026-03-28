@@ -12,23 +12,26 @@
 
     <h2>All Events</h2>
 
+    <!-- FILTER -->
     <div class="card p-3 mb-4">
         <form method="get" action="/events">
 
             <div class="row g-3">
 
+                <!-- TYPE -->
                 <div class="col-md-3">
                     <label class="form-label">Event Type</label>
                     <select class="form-control" name="type">
                         <option value="">All types</option>
-                        <option th:each="t : ${T(pt.unl.fct.iadi.novaevents.model.EventType).values()}"
-                                th:value="${t}"
-                                th:text="${t}"
-                                th:selected="${t} == ${param.type}">
+                        <option th:each="t : ${types}"
+                                th:value="${t.name}"
+                                th:text="${t.name}"
+                                th:selected="${t.name} == ${param.type}">
                         </option>
                     </select>
                 </div>
 
+                <!-- CLUB -->
                 <div class="col-md-3">
                     <label class="form-label">Club</label>
                     <select class="form-control" name="clubId">
@@ -41,6 +44,7 @@
                     </select>
                 </div>
 
+                <!-- FROM -->
                 <div class="col-md-2">
                     <label class="form-label">From</label>
                     <input type="date" class="form-control"
@@ -48,6 +52,7 @@
                            th:value="${param.from}">
                 </div>
 
+                <!-- TO -->
                 <div class="col-md-2">
                     <label class="form-label">To</label>
                     <input type="date" class="form-control"
@@ -55,6 +60,7 @@
                            th:value="${param.to}">
                 </div>
 
+                <!-- BUTTON -->
                 <div class="col-md-2 d-flex align-items-end">
                     <button class="btn btn-primary w-100">Filter</button>
                 </div>
@@ -64,6 +70,7 @@
         </form>
     </div>
 
+    <!-- TABLE -->
     <table class="table table-striped table-bordered">
         <thead class="table-dark">
         <tr>
@@ -78,29 +85,41 @@
 
         <tbody>
 
+        <!-- EMPTY -->
         <tr th:if="${#lists.isEmpty(events)}">
             <td colspan="6" class="text-center">No events found</td>
         </tr>
 
+        <!-- ROWS -->
         <tr th:each="event : ${events}">
 
+            <!-- NAME -->
             <td>
-                <a th:href="@{/clubs/{clubId}/events/{id}(clubId=${event.clubId}, id=${event.id})}"
+                <a th:href="@{/events/{id}(id=${event.id})}"
                    th:text="${event.name}"></a>
             </td>
 
-            <td th:text="${event.clubId}"></td>
+            <!-- CLUB -->
+            <td th:text="${event.club.name}"></td>
 
-            ...
+            <!-- DATE -->
+            <td th:text="${event.date}"></td>
 
+            <!-- TYPE -->
+            <td th:text="${event.type.name}"></td>
+
+            <!-- LOCATION -->
+            <td th:text="${event.location}"></td>
+
+            <!-- ACTIONS -->
             <td>
                 <a class="btn btn-outline-primary btn-sm"
-                   th:href="@{/clubs/{clubId}/events/{id}/edit(clubId=${event.clubId}, id=${event.id})}">
+                   th:href="@{/clubs/{clubId}/events/{id}/edit(clubId=${event.club.id}, id=${event.id})}">
                     Edit
                 </a>
 
                 <a class="btn btn-outline-danger btn-sm"
-                   th:href="@{/clubs/{clubId}/events/{id}/delete(clubId=${event.clubId}, id=${event.id})}">
+                   th:href="@{/clubs/{clubId}/events/{id}/delete(clubId=${event.club.id}, id=${event.id})}">
                     Delete
                 </a>
             </td>

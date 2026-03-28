@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Create Event</title>
+    <title>Edit Event</title>
 </head>
 <body>
 
@@ -28,11 +28,16 @@
         <br>
 
         Type:
-        <select th:field="*{type}">
+        <select th:field="*{typeId}">
             <option value="">Select type</option>
-            <option th:each="t : ${types}" th:value="${t}" th:text="${t}"></option>
+            <option th:each="t : ${types}"
+                    th:value="${t.id}"
+                    th:text="${t.name}"
+                    th:selected="${t.id == eventForm.typeId}">
+            </option>
         </select>
-        <span th:if="${#fields.hasErrors('type')}" th:errors="*{type}"></span>
+
+        <span th:if="${#fields.hasErrors('typeId')}" th:errors="*{typeId}"></span>
 
         <br>
 

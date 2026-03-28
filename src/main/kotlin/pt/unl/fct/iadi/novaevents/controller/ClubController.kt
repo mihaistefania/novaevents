@@ -17,14 +17,20 @@ class ClubController(
 
     @GetMapping
     fun listClubs(model: Model): String {
-        model.addAttribute("clubs", clubService.getAll())
+        model.addAttribute("clubs", clubService.findAll())
         return "clubs/list"
     }
 
     @GetMapping("/{id}")
     fun clubDetail(@PathVariable id: Long, model: Model): String {
-        val club = clubService.getById(id)
-        val events = eventService.getByClub(id)
+        val club = clubService.findById(id)
+
+        val events = eventService.filter(
+            type = null,
+            clubId = id,
+            from = null,
+            to = null
+        )
 
         model.addAttribute("club", club)
         model.addAttribute("events", events)
