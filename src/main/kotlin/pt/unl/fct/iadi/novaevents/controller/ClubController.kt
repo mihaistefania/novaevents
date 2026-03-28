@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import pt.unl.fct.iadi.novaevents.service.ClubService
 import pt.unl.fct.iadi.novaevents.service.EventService
+import org.springframework.http.HttpStatus
+import org.springframework.web.server.ResponseStatusException
 
 @Controller
 @RequestMapping("/clubs")
@@ -35,14 +37,9 @@ class ClubController(
     fun clubDetail(@PathVariable id: Long, model: Model): String {
 
         val club = clubService.findByIdOrNull(id)
-            ?: return "error/404"
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
 
-        val events = eventService.filter(
-            type = null,
-            clubId = id,
-            from = null,
-            to = null
-        )
+        val events = eventService.filter(null, id, null, null)
 
         model.addAttribute("club", club)
         model.addAttribute("events", events)
