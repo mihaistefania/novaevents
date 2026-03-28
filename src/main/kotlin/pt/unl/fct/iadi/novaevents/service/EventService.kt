@@ -34,7 +34,6 @@ class EventService(
             throw IllegalArgumentException("An event with this name already exists")
         }
 
-        // ✅ UPDATE FIELDS (NO copy!)
         existing.name = updated.name
         existing.date = updated.date
         existing.location = updated.location
@@ -73,7 +72,6 @@ class EventService(
                 eventRepository.findAll()
         }
 
-        // date filtering (still OK here)
         return events.filter {
             (from == null || !it.date.isBefore(from)) &&
                     (to == null || !it.date.isAfter(to))

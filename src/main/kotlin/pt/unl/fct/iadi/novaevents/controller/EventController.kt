@@ -20,7 +20,6 @@ class EventController(
     private val eventTypeRepository: EventTypeRepository
 ) {
 
-    // -------- LIST --------
     @GetMapping("/events")
     fun listEvents(
         @RequestParam(required = false) type: String?,
@@ -50,7 +49,6 @@ class EventController(
         return "events/list"
     }
 
-    // -------- DETAIL --------
     @GetMapping("/events/{id}")
     fun detail(@PathVariable id: Long, model: ModelMap): String {
 
@@ -62,7 +60,6 @@ class EventController(
         return "events/detail"
     }
 
-    // -------- CREATE FORM --------
     @GetMapping("/events/create/{clubId}")
     fun showCreateForm(@PathVariable clubId: Long, model: Model): String {
 
@@ -76,7 +73,6 @@ class EventController(
         return "events/form"
     }
 
-    // -------- CREATE --------
     @PostMapping("/clubs/{clubId}/events")
     fun createEvent(
         @PathVariable clubId: Long,
@@ -109,7 +105,6 @@ class EventController(
         return "redirect:/events/${created.id}"
     }
 
-    // -------- EDIT FORM --------
     @GetMapping("/clubs/{clubId}/events/{id}/edit")
     fun showEditForm(
         @PathVariable clubId: Long,
@@ -135,7 +130,6 @@ class EventController(
         return "events/edit-form"
     }
 
-    // -------- UPDATE --------
     @PutMapping("/clubs/{clubId}/events/{id}")
     fun updateEvent(
         @PathVariable clubId: Long,
@@ -169,7 +163,6 @@ class EventController(
         return "redirect:/events/$id"
     }
 
-    // -------- DELETE --------
     @DeleteMapping("/clubs/{clubId}/events/{id}")
     fun deleteEvent(
         @PathVariable clubId: Long,
