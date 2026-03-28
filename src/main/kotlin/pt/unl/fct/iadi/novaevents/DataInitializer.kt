@@ -36,8 +36,8 @@ class DataInitializer(
         ))
 
         eventRepository.saveAll(listOf(
-            Event(name = "Chess Workshop", date = LocalDate.now(), location = "Room A", description = "Basics", club = clubs[0], type = types[0]),
-            Event(name = "Chess Tournament", date = LocalDate.now(), location = "Hall", description = "Competition", club = clubs[0], type = types[2]),
+            Event(name = "Beginner's Chess Workshop", date = LocalDate.now(), location = "Room A", description = "Basics", club = clubs[0], type = types[0]),
+            Event(name = "Spring Chess Tournament", date = LocalDate.now(), location = "Hall", description = "Competition", club = clubs[0], type = types[2]),
 
             Event(name = "Robotics Intro", date = LocalDate.now(), location = "Lab", description = "Intro robotics", club = clubs[1], type = types[0]),
 
