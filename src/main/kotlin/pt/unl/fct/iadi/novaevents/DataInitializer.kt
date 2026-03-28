@@ -29,7 +29,7 @@ class DataInitializer(
 
         val clubs = clubRepository.saveAll(listOf(
             Club(name = "Chess Club", description = "Play and learn chess.", category = ClubCategory.ACADEMIC),
-            Club(name = "Robotics Club", description = "Build robots.", category = ClubCategory.TECHNOLOGY),
+            Club(name = "Robotics Club", description = "The Robotics Club is the place to turn ideas into machines.", category = ClubCategory.TECHNOLOGY),
             Club(name = "Photography Club", description = "Capture moments.", category = ClubCategory.ARTS),
             Club(name = "Hiking & Outdoors Club", description = "Explore nature.", category = ClubCategory.SPORTS),
             Club(name = "Film Society", description = "Watch movies.", category = ClubCategory.CULTURAL)
