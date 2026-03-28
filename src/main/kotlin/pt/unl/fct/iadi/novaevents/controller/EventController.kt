@@ -14,6 +14,7 @@ import pt.unl.fct.iadi.novaevents.service.EventService
 import java.time.LocalDate
 import org.springframework.http.HttpStatus
 import org.springframework.web.server.ResponseStatusException
+import org.springframework.web.servlet.mvc.support.RedirectAttributes
 
 @Controller
 class EventController(
@@ -76,7 +77,7 @@ class EventController(
         model.addAttribute("clubId", clubId)
         model.addAttribute("types", eventTypeRepository.findAll())
 
-        return "events/form"
+        return "redirect:/events/create/$clubId"
     }
 
     @PostMapping("/clubs/{clubId}/events")
@@ -84,13 +85,14 @@ class EventController(
         @PathVariable clubId: Long,
         @Valid @ModelAttribute eventForm: EventForm,
         bindingResult: BindingResult,
-        model: Model
+        model: Model,
+        redirectAttributes: RedirectAttributes
     ): String {
 
         if (bindingResult.hasErrors()) {
-            model.addAttribute("types", eventTypeRepository.findAll())
-            model.addAttribute("clubId", clubId)
-            return "events/form"
+            redirectAttributes.addFlashAttribute("eventForm", eventForm)
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.eventForm", bindingResult)
+            return "redirect:/events/create/$clubId"
         }
 
         val club = clubService.findById(clubId)
@@ -106,9 +108,16 @@ class EventController(
             type = type
         )
 
-        val created = eventService.create(event)
+        return try {
+            eventService.create(event)
+            "redirect:/clubs/$clubId"
+        } catch (e: IllegalArgumentException) {
 
-        return "redirect:/events/${created.id}"
+            redirectAttributes.addFlashAttribute("error", e.message)
+            redirectAttributes.addFlashAttribute("eventForm", eventForm)
+
+            "redirect:/events/create/$clubId"
+        }
     }
 
     @GetMapping("/clubs/{clubId}/events/{id}/edit")
