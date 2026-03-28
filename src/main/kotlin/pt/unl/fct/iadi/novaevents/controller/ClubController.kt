@@ -18,11 +18,10 @@ class ClubController(
     @GetMapping
     fun listClubs(model: Model): String {
 
-        val clubs = clubService.findAll()
+        val result = clubService.findAllWithEventCount()
 
-        val clubEventCounts = clubs.associateWith { club ->
-            eventService.filter(null, club.id, null, null).size
-        }
+        val clubs = result.map { it.first }
+        val clubEventCounts = result.associate { it.first to it.second }
 
         model.addAttribute("clubs", clubs)
         model.addAttribute("clubEventCounts", clubEventCounts)
