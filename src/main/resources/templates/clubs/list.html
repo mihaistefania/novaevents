@@ -17,8 +17,8 @@
         <tr>
             <th>Name</th>
             <th>Category</th>
-            <th>Events</th> <!-- ✅ MUST BE 3rd -->
             <th>Description</th>
+            <th>Events</th>
             <th>Actions</th>
         </tr>
         </thead>
@@ -26,10 +26,8 @@
         <tbody>
         <tr th:each="club : ${clubs}">
 
-            <!-- Name -->
             <td th:text="${club.name}"></td>
 
-            <!-- Category -->
             <td>
                 <span class="badge"
                       th:classappend="
@@ -43,11 +41,6 @@
                 </span>
             </td>
 
-            <!-- ✅ EVENTS COUNT (CRITICAL FOR TEST) -->
-            <!-- NO class, NO span, NO formatting -->
-            <td>[[${clubEventCounts[club]}]]</td>
-
-            <!-- Description -->
             <td>
                 <details>
                     <summary>View</summary>
@@ -55,7 +48,8 @@
                 </details>
             </td>
 
-            <!-- Actions -->
+            <td>[[${clubEventCounts[club.id]}]]</td>
+
             <td>
                 <a class="btn btn-outline-primary btn-sm"
                    th:href="@{/clubs/{id}(id=${club.id})}">

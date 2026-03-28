@@ -21,7 +21,9 @@ class ClubController(
         val result = clubService.findAllWithEventCount()
 
         val clubs = result.map { it.first }
-        val clubEventCounts = result.associate { it.first to it.second }
+        val clubEventCounts = result.associate { (club, count) ->
+            club.id to count
+        }
 
         model.addAttribute("clubs", clubs)
         model.addAttribute("clubEventCounts", clubEventCounts)
