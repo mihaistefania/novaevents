@@ -14,6 +14,7 @@ import pt.unl.fct.iadi.novaevents.service.EventService
 import java.time.LocalDate
 import org.springframework.http.HttpStatus
 import org.springframework.web.server.ResponseStatusException
+import org.springframework.web.servlet.mvc.support.RedirectAttributes
 
 @Controller
 class EventController(
@@ -53,6 +54,7 @@ class EventController(
 
     @GetMapping("/events/{id}")
     fun detail(@PathVariable id: Long, model: ModelMap): String {
+
         val event = try {
             eventService.getById(id)
         } catch (e: NoSuchElementException) {
@@ -75,7 +77,7 @@ class EventController(
         model.addAttribute("clubId", clubId)
         model.addAttribute("types", eventTypeRepository.findAll())
 
-        return "events/create-form"
+        return "redirect:/events/create/$clubId"
     }
 
     @PostMapping("/clubs/{clubId}/events")
@@ -83,13 +85,14 @@ class EventController(
         @PathVariable clubId: Long,
         @Valid @ModelAttribute eventForm: EventForm,
         bindingResult: BindingResult,
-        model: Model
+        model: Model,
+        redirectAttributes: RedirectAttributes
     ): String {
 
         if (bindingResult.hasErrors()) {
-            model.addAttribute("types", eventTypeRepository.findAll())
-            model.addAttribute("clubId", clubId)
-            return "events/create-form"
+            redirectAttributes.addFlashAttribute("eventForm", eventForm)
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.eventForm", bindingResult)
+            return "redirect:/events/create/$clubId"
         }
 
         val club = clubService.findById(clubId)
@@ -106,17 +109,14 @@ class EventController(
         )
 
         return try {
-            val created = eventService.create(event)
-            "redirect:/clubs/$clubId/events/${created.id}"
+            eventService.create(event)
+            "redirect:/clubs/$clubId"
         } catch (e: IllegalArgumentException) {
 
-            // ✅ FIXED: return form instead of redirect
-            model.addAttribute("error", e.message)
-            model.addAttribute("eventForm", eventForm)
-            model.addAttribute("types", eventTypeRepository.findAll())
-            model.addAttribute("clubId", clubId)
+            redirectAttributes.addFlashAttribute("error", e.message)
+            redirectAttributes.addFlashAttribute("eventForm", eventForm)
 
-            "events/create-form"
+            "redirect:/events/create/$clubId"
         }
     }
 
@@ -157,7 +157,6 @@ class EventController(
         if (bindingResult.hasErrors()) {
             model.addAttribute("types", eventTypeRepository.findAll())
             model.addAttribute("eventId", id)
-            model.addAttribute("clubId", clubId)
             return "events/edit-form"
         }
 
@@ -189,7 +188,6 @@ class EventController(
 
         return "redirect:/clubs/$clubId"
     }
-
     @GetMapping("/clubs/{clubId}/events/{id}")
     fun detailFromClub(
         @PathVariable clubId: Long,
