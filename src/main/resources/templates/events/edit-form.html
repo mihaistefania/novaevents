@@ -27,7 +27,7 @@
         <br>
 
         Type:
-        <select th:field="*{typeId}">
+        <select th:field="*{typeId}" name="typeId" required>
             <option value="">Select type</option>
             <option th:each="t : ${types}"
                     th:value="${t.id}"
