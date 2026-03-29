@@ -15,31 +15,54 @@
 
         <input type="hidden" th:field="*{clubId}">
 
-        Name:
-        <input type="text" th:field="*{name}"/>
-        <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+        <!-- NAME -->
+        <div>
+            Name:
+            <input type="text" th:field="*{name}"/>
+            <span th:if="${#fields.hasErrors('name')}"
+                  th:errors="*{name}"></span>
+        </div>
 
         <br>
 
-        Date:
-        <input type="date" th:field="*{date}"/>
-        <span th:if="${#fields.hasErrors('date')}" th:errors="*{date}"></span>
+        <!-- DATE -->
+        <div>
+            Date:
+            <input type="date" th:field="*{date}"/>
+            <span th:if="${#fields.hasErrors('date')}"
+                  th:errors="*{date}"></span>
+        </div>
 
         <br>
 
-        Type:
-        <select th:field="*{typeId}" required>
-            <option th:each="t : ${types}"
-                    th:value="${t.id}"
-                    th:text="${t.name}">
-            </option>
-        </select>
+        <!-- TYPE -->
+        <div>
+            Type:
+            <select th:field="*{typeId}">
+                <!-- ❗ IMPORTANT: allow empty value so validation triggers -->
+                <option value="">-- Select type --</option>
 
-        <span th:if="${#fields.hasErrors('typeId')}" th:errors="*{typeId}"></span>
+                <option th:each="t : ${types}"
+                        th:value="${t.id}"
+                        th:text="${t.name}">
+                </option>
+            </select>
+
+            <span th:if="${#fields.hasErrors('typeId')}"
+                  th:errors="*{typeId}"></span>
+        </div>
+
+        <br>
+
+        <!-- GLOBAL ERROR (duplicate, etc) -->
+        <div th:if="${error}">
+            <span th:text="${error}"></span>
+        </div>
 
         <br>
 
         <button type="submit">Create</button>
+
     </form>
 
 </div>

@@ -15,29 +15,49 @@
 
         <input type="hidden" name="_method" value="put">
 
-        Name:
-        <input type="text" th:field="*{name}"/>
-        <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+        <!-- NAME -->
+        <div>
+            Name:
+            <input type="text" th:field="*{name}"/>
+            <span th:if="${#fields.hasErrors('name')}"
+                  th:errors="*{name}"></span>
+        </div>
 
         <br>
 
-        Date:
-        <input type="date" th:field="*{date}"/>
-        <span th:if="${#fields.hasErrors('date')}" th:errors="*{date}"></span>
+        <!-- DATE -->
+        <div>
+            Date:
+            <input type="date" th:field="*{date}"/>
+            <span th:if="${#fields.hasErrors('date')}"
+                  th:errors="*{date}"></span>
+        </div>
 
         <br>
 
-        Type:
-        <select th:field="*{typeId}">
-            <option value="">Select type</option>
-            <option th:each="t : ${types}"
-                    th:value="${t.id}"
-                    th:text="${t.name}"
-                    th:selected="${t.id == eventForm.typeId}">
-            </option>
-        </select>
+        <!-- TYPE -->
+        <div>
+            Type:
+            <select th:field="*{typeId}">
+                <!-- ❗ IMPORTANT: allow empty to trigger validation -->
+                <option value="">-- Select type --</option>
 
-        <span th:if="${#fields.hasErrors('typeId')}" th:errors="*{typeId}"></span>
+                <option th:each="t : ${types}"
+                        th:value="${t.id}"
+                        th:text="${t.name}">
+                </option>
+            </select>
+
+            <span th:if="${#fields.hasErrors('typeId')}"
+                  th:errors="*{typeId}"></span>
+        </div>
+
+        <br>
+
+        <!-- GLOBAL ERROR -->
+        <div th:if="${error}">
+            <span th:text="${error}"></span>
+        </div>
 
         <br>
 
