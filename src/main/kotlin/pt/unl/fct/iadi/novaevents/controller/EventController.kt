@@ -91,6 +91,10 @@ class EventController(
         model: Model
     ): String {
 
+        if (eventForm.typeId == null) {
+            bindingResult.rejectValue("typeId", "error.typeId", "Event type is required")
+        }
+
         if (bindingResult.hasErrors()) {
             model.addAttribute("types", eventTypeRepository.findAll())
             model.addAttribute("clubId", clubId)
@@ -112,9 +116,7 @@ class EventController(
 
         return try {
             val created = eventService.create(event)
-
             "redirect:/clubs/$clubId/events/${created.id}"
-
         } catch (e: IllegalArgumentException) {
 
             bindingResult.rejectValue("name", "error.name", e.message!!)
@@ -159,6 +161,10 @@ class EventController(
         bindingResult: BindingResult,
         model: Model
     ): String {
+
+        if (eventForm.typeId == null) {
+            bindingResult.rejectValue("typeId", "error.typeId", "Event type is required")
+        }
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("types", eventTypeRepository.findAll())

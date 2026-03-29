@@ -16,7 +16,6 @@ class EventForm(
 
     var description: String? = null,
 
-    @field:NotNull(message = "Event type is required")
     var typeId: Long? = null,
 
     var clubId: Long? = null
