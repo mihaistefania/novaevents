@@ -68,16 +68,21 @@ class EventController(
     }
 
     @GetMapping("/events/create/{clubId}")
-    fun showCreateForm(@PathVariable clubId: Long, model: Model): String {
+    fun showCreateForm(
+        @PathVariable clubId: Long,
+        model: Model
+    ): String {
 
-        val form = EventForm()
-        form.clubId = clubId
+        if (!model.containsAttribute("eventForm")) {
+            val form = EventForm()
+            form.clubId = clubId
+            model.addAttribute("eventForm", form)
+        }
 
-        model.addAttribute("eventForm", form)
         model.addAttribute("clubId", clubId)
         model.addAttribute("types", eventTypeRepository.findAll())
 
-        return "redirect:/events/create/$clubId"
+        return "events/create-form"
     }
 
     @PostMapping("/clubs/{clubId}/events")
@@ -85,13 +90,16 @@ class EventController(
         @PathVariable clubId: Long,
         @Valid @ModelAttribute eventForm: EventForm,
         bindingResult: BindingResult,
-        model: Model
+        redirectAttributes: RedirectAttributes
     ): String {
 
         if (bindingResult.hasErrors()) {
-            model.addAttribute("types", eventTypeRepository.findAll())
-            model.addAttribute("clubId", clubId)
-            return "events/create-form"
+            redirectAttributes.addFlashAttribute("eventForm", eventForm)
+            redirectAttributes.addFlashAttribute(
+                "org.springframework.validation.BindingResult.eventForm",
+                bindingResult
+            )
+            return "redirect:/events/create/$clubId"
         }
 
         val club = clubService.findById(clubId)
@@ -109,12 +117,15 @@ class EventController(
 
         return try {
             val created = eventService.create(event)
+
             "redirect:/clubs/$clubId/events/${created.id}"
+
         } catch (e: IllegalArgumentException) {
-            model.addAttribute("error", e.message)
-            model.addAttribute("types", eventTypeRepository.findAll())
-            model.addAttribute("clubId", clubId)
-            "events/create-form"
+
+            redirectAttributes.addFlashAttribute("error", e.message)
+            redirectAttributes.addFlashAttribute("eventForm", eventForm)
+
+            "redirect:/events/create/$clubId"
         }
     }
 
