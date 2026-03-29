@@ -18,21 +18,11 @@ class EventService(
             .orElseThrow { NoSuchElementException("Event not found") }
 
     fun create(event: Event): Event {
-
-        if (eventRepository.existsByNameIgnoreCaseAndClub_Id(event.name, event.club.id)) {
-            throw IllegalArgumentException("An event with this name already exists")
-        }
-
         return eventRepository.save(event)
     }
 
     fun update(id: Long, updated: Event): Event {
-
         val existing = getById(id)
-
-        if (eventRepository.existsByNameIgnoreCaseAndIdNotAndClub_Id(updated.name, id, updated.club.id)) {
-            throw IllegalArgumentException("An event with this name already exists")
-        }
 
         existing.name = updated.name
         existing.date = updated.date
