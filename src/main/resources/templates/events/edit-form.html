@@ -15,54 +15,42 @@
 
         <input type="hidden" name="_method" value="put">
 
-        <!-- NAME -->
-        <div>
-            Name:
-            <input type="text" th:field="*{name}"/>
-            <span th:if="${#fields.hasErrors('name')}"
-                  th:errors="*{name}"></span>
-        </div>
+        Name:
+        <input type="text" th:field="*{name}"/>
+        <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
 
         <br>
 
-        <!-- DATE -->
-        <div>
-            Date:
-            <input type="date" th:field="*{date}"/>
-            <span th:if="${#fields.hasErrors('date')}"
-                  th:errors="*{date}"></span>
-        </div>
+        Date:
+        <input type="date" th:field="*{date}"/>
+        <span th:if="${#fields.hasErrors('date')}" th:errors="*{date}"></span>
 
         <br>
 
-        <!-- TYPE -->
-        <div>
-            Type:
-            <select th:field="*{typeId}">
-                <!-- ❗ IMPORTANT: allow empty to trigger validation -->
-                <option value="">-- Select type --</option>
+        Type:
+        <select th:field="*{typeId}">
+            <option value="">Select type</option>
+            <option th:each="t : ${types}"
+                    th:value="${t.id}"
+                    th:text="${t.name}">
+            </option>
+        </select>
 
-                <option th:each="t : ${types}"
-                        th:value="${t.id}"
-                        th:text="${t.name}">
-                </option>
-            </select>
-
-            <span th:if="${#fields.hasErrors('typeId')}"
-                  th:errors="*{typeId}"></span>
-        </div>
+        <span th:if="${#fields.hasErrors('typeId')}" th:errors="*{typeId}"></span>
 
         <br>
 
-        <!-- GLOBAL ERROR -->
-        <div th:if="${error}">
-            <span th:text="${error}"></span>
-        </div>
+        Location:
+        <input type="text" th:field="*{location}"/>
+
+        <br>
+
+        Description:
+        <textarea th:field="*{description}"></textarea>
 
         <br>
 
         <button type="submit">Update</button>
-
     </form>
 
 </div>

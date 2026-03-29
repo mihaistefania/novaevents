@@ -15,7 +15,6 @@
 
         <input type="hidden" th:field="*{clubId}">
 
-        <!-- NAME -->
         <div>
             Name:
             <input type="text" th:field="*{name}"/>
@@ -25,7 +24,6 @@
 
         <br>
 
-        <!-- DATE -->
         <div>
             Date:
             <input type="date" th:field="*{date}"/>
@@ -35,26 +33,21 @@
 
         <br>
 
-        <!-- TYPE -->
         <div>
             Type:
             <select th:field="*{typeId}">
-                <!-- ❗ IMPORTANT: allow empty value so validation triggers -->
-                <option value="">-- Select type --</option>
-
+                <option value="">Select type</option>
                 <option th:each="t : ${types}"
                         th:value="${t.id}"
                         th:text="${t.name}">
                 </option>
             </select>
 
-            <span th:if="${#fields.hasErrors('typeId')}"
-                  th:errors="*{typeId}"></span>
+            <span th:if="${#fields.hasErrors('typeId')}" th:errors="*{typeId}"></span>
         </div>
 
         <br>
 
-        <!-- GLOBAL ERROR (duplicate, etc) -->
         <div th:if="${error}">
             <span th:text="${error}"></span>
         </div>

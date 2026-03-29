@@ -94,7 +94,7 @@ class EventController(
         if (bindingResult.hasErrors()) {
             model.addAttribute("types", eventTypeRepository.findAll())
             model.addAttribute("clubId", clubId)
-            return "events/create-form"
+            return "events/form"
         }
 
         val club = clubService.findById(clubId)
@@ -112,16 +112,15 @@ class EventController(
 
         return try {
             val created = eventService.create(event)
-
             "redirect:/clubs/$clubId/events/${created.id}"
-
         } catch (e: IllegalArgumentException) {
 
-            model.addAttribute("error", e.message)
+            bindingResult.rejectValue("name", "error.name", e.message!!)
+
             model.addAttribute("types", eventTypeRepository.findAll())
             model.addAttribute("clubId", clubId)
 
-            "events/create-form"
+            "events/form"
         }
     }
 
@@ -132,20 +131,17 @@ class EventController(
         model: Model
     ): String {
 
-        if (!model.containsAttribute("eventForm")) {
-            val event = eventService.getById(id)
+        val event = eventService.getById(id)
 
-            val form = EventForm(
-                name = event.name,
-                date = event.date,
-                location = event.location,
-                typeId = event.type.id,
-                description = event.description
-            )
+        val form = EventForm(
+            name = event.name,
+            date = event.date,
+            location = event.location,
+            description = event.description,
+            typeId = event.type.id
+        )
 
-            model.addAttribute("eventForm", form)
-        }
-
+        model.addAttribute("eventForm", form)
         model.addAttribute("eventId", id)
         model.addAttribute("clubId", clubId)
         model.addAttribute("types", eventTypeRepository.findAll())
@@ -184,12 +180,11 @@ class EventController(
 
         return try {
             eventService.update(id, updated)
-
             "redirect:/clubs/$clubId/events/$id"
-
         } catch (e: IllegalArgumentException) {
 
-            model.addAttribute("error", e.message)
+            bindingResult.rejectValue("name", "error.name", e.message!!)
+
             model.addAttribute("types", eventTypeRepository.findAll())
             model.addAttribute("eventId", id)
             model.addAttribute("clubId", clubId)
