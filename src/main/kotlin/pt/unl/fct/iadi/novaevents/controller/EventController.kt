@@ -151,7 +151,7 @@ class EventController(
         return "events/edit-form"
     }
 
-    @PutMapping("/clubs/{clubId}/events/{id}")
+    @PostMapping("/clubs/{clubId}/events/{id}")
     fun updateEvent(
         @PathVariable clubId: Long,
         @PathVariable id: Long,
@@ -182,9 +182,7 @@ class EventController(
 
         return try {
             eventService.update(id, updated)
-
             "redirect:/clubs/$clubId/events/$id"
-
         } catch (e: IllegalArgumentException) {
 
             bindingResult.rejectValue("name", "error.name", e.message!!)
@@ -197,7 +195,7 @@ class EventController(
         }
     }
 
-    @DeleteMapping("/clubs/{clubId}/events/{id}")
+    @PostMapping("/clubs/{clubId}/events/{id}/delete")
     fun deleteEvent(
         @PathVariable clubId: Long,
         @PathVariable id: Long

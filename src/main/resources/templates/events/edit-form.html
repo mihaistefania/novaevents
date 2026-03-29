@@ -10,10 +10,9 @@
 <div class="container mt-4">
 
     <form th:action="@{/clubs/{clubId}/events/{id}(clubId=${clubId}, id=${eventId})}"
-          th:object="${eventForm}"
-          method="post">
+          method="post"
+          th:object="${eventForm}">
 
-        <input type="hidden" name="_method" value="put">
 
         Name:
         <input type="text" th:field="*{name}"/>
