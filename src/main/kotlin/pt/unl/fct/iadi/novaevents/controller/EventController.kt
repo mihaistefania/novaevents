@@ -17,13 +17,14 @@ import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.servlet.mvc.support.RedirectAttributes
 
 @Controller
+@RequestMapping("/clubs/{clubId}/events")
 class EventController(
     private val eventService: EventService,
     private val clubService: ClubService,
     private val eventTypeRepository: EventTypeRepository
 ) {
 
-    @GetMapping("/events")
+    @GetMapping()
     fun listEvents(
         @RequestParam(required = false) type: String?,
         @RequestParam(required = false) clubId: String?,
@@ -52,7 +53,7 @@ class EventController(
         return "events/list"
     }
 
-    @GetMapping("/events/{id}")
+    @GetMapping("/{id}")
     fun detail(@PathVariable id: Long, model: ModelMap): String {
 
         val event = try {
@@ -67,7 +68,7 @@ class EventController(
         return "events/detail"
     }
 
-    @GetMapping("/events/create/{clubId}")
+    @GetMapping("/create/{clubId}")
     fun showCreateForm(
         @PathVariable clubId: Long,
         model: Model
@@ -83,7 +84,7 @@ class EventController(
         return "events/create-form"
     }
 
-    @PostMapping("/clubs/{clubId}/events")
+    @PostMapping()
     fun createEvent(
         @PathVariable clubId: Long,
         @Valid @ModelAttribute eventForm: EventForm,
@@ -128,7 +129,7 @@ class EventController(
         }
     }
 
-    @GetMapping("/clubs/{clubId}/events/{id}/edit")
+    @GetMapping("/{id}/edit")
     fun showEditForm(
         @PathVariable clubId: Long,
         @PathVariable id: Long,
@@ -153,7 +154,7 @@ class EventController(
         return "events/edit-form"
     }
 
-    @PutMapping("/clubs/{clubId}/events/{id}")
+    @PutMapping("/{id}")
     fun updateEvent(
         @PathVariable clubId: Long,
         @PathVariable id: Long,
@@ -201,7 +202,7 @@ class EventController(
         }
     }
 
-    @DeleteMapping("/clubs/{clubId}/events/{id}")
+    @DeleteMapping("/{id}")
     fun deleteEvent(
         @PathVariable clubId: Long,
         @PathVariable id: Long
@@ -211,7 +212,7 @@ class EventController(
 
         return "redirect:/clubs/$clubId"
     }
-    @GetMapping("/clubs/{clubId}/events/{id}")
+    @GetMapping("/{id}")
     fun detailFromClub(
         @PathVariable clubId: Long,
         @PathVariable id: Long,
