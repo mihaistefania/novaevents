@@ -88,13 +88,16 @@ class EventController(
         @PathVariable clubId: Long,
         @Valid @ModelAttribute eventForm: EventForm,
         bindingResult: BindingResult,
-        model: Model
+        redirectAttributes: RedirectAttributes
     ): String {
 
         if (bindingResult.hasErrors()) {
-            model.addAttribute("types", eventTypeRepository.findAll())
-            model.addAttribute("clubId", clubId)
-            return "redirect:/events/create-form"
+            redirectAttributes.addFlashAttribute("eventForm", eventForm)
+            redirectAttributes.addFlashAttribute(
+                "org.springframework.validation.BindingResult.eventForm",
+                bindingResult
+            )
+            return "redirect:/events/create/$clubId"
         }
 
         val club = clubService.findById(clubId)
@@ -117,11 +120,10 @@ class EventController(
 
         } catch (e: IllegalArgumentException) {
 
-            model.addAttribute("error", e.message)
-            model.addAttribute("types", eventTypeRepository.findAll())
-            model.addAttribute("clubId", clubId)
+            redirectAttributes.addFlashAttribute("error", e.message)
+            redirectAttributes.addFlashAttribute("eventForm", eventForm)
 
-            "redirect:/events/create-form"
+            "redirect:/events/create/$clubId"
         }
     }
 
@@ -132,17 +134,20 @@ class EventController(
         model: Model
     ): String {
 
-        val event = eventService.getById(id)
+        if (!model.containsAttribute("eventForm")) {
+            val event = eventService.getById(id)
 
-        val form = EventForm(
-            name = event.name,
-            date = event.date,
-            location = event.location,
-            typeId = event.type.id,
-            description = event.description
-        )
+            val form = EventForm(
+                name = event.name,
+                date = event.date,
+                location = event.location,
+                typeId = event.type.id,
+                description = event.description
+            )
 
-        model.addAttribute("eventForm", form)
+            model.addAttribute("eventForm", form)
+        }
+
         model.addAttribute("eventId", id)
         model.addAttribute("clubId", clubId)
         model.addAttribute("types", eventTypeRepository.findAll())
@@ -156,13 +161,16 @@ class EventController(
         @PathVariable id: Long,
         @Valid @ModelAttribute eventForm: EventForm,
         bindingResult: BindingResult,
-        model: Model
+        redirectAttributes: RedirectAttributes
     ): String {
 
         if (bindingResult.hasErrors()) {
-            model.addAttribute("types", eventTypeRepository.findAll())
-            model.addAttribute("eventId", id)
-            return "events/edit-form"
+            redirectAttributes.addFlashAttribute("eventForm", eventForm)
+            redirectAttributes.addFlashAttribute(
+                "org.springframework.validation.BindingResult.eventForm",
+                bindingResult
+            )
+            return "redirect:/clubs/$clubId/events/$id/edit"
         }
 
         val club = clubService.findById(clubId)
@@ -178,9 +186,18 @@ class EventController(
             type = type
         )
 
-        eventService.update(id, updated)
+        return try {
+            eventService.update(id, updated)
 
-        return "redirect:/events/$id"
+            "redirect:/clubs/$clubId/events/$id"
+
+        } catch (e: IllegalArgumentException) {
+
+            redirectAttributes.addFlashAttribute("error", e.message)
+            redirectAttributes.addFlashAttribute("eventForm", eventForm)
+
+            "redirect:/clubs/$clubId/events/$id/edit"
+        }
     }
 
     @DeleteMapping("/clubs/{clubId}/events/{id}")
