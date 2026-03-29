@@ -12,7 +12,7 @@
     <form th:action="@{/clubs/{clubId}/events/{id}(clubId=${clubId}, id=${eventId})}"
           method="post"
           th:object="${eventForm}">
-
+        <input type="hidden" name="_method" value="put">
 
         Name:
         <input type="text" th:field="*{name}"/>

@@ -153,7 +153,7 @@ class EventController(
         return "events/edit-form"
     }
 
-    @PostMapping("/clubs/{clubId}/events/{id}")
+    @PutMapping("/clubs/{clubId}/events/{id}")
     fun updateEvent(
         @PathVariable clubId: Long,
         @PathVariable id: Long,
@@ -201,7 +201,7 @@ class EventController(
         }
     }
 
-    @PostMapping("/clubs/{clubId}/events/{id}/delete")
+    @DeleteMapping("/clubs/{clubId}/events/{id}")
     fun deleteEvent(
         @PathVariable clubId: Long,
         @PathVariable id: Long

@@ -17,9 +17,9 @@
         <li><strong>Location:</strong> <span th:text="${event.location}"></span></li>
     </ul>
 
-    <form th:action="@{/clubs/{clubId}/events/{id}/delete(clubId=${clubId}, id=${event.id})}"
+    <form th:action="@{/clubs/{clubId}/events/{id}(clubId=${clubId}, id=${event.id})}"
           method="post">
-
+        <input type="hidden" name="_method" value="delete">
 
         <button type="submit">Confirm Delete</button>
     </form>
