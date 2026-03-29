@@ -88,11 +88,13 @@ class EventController(
         @PathVariable clubId: Long,
         @Valid @ModelAttribute eventForm: EventForm,
         bindingResult: BindingResult,
-        redirectAttributes: RedirectAttributes
+        model: Model
     ): String {
 
         if (bindingResult.hasErrors()) {
-            return "redirect:/events/create/$clubId"
+            model.addAttribute("types", eventTypeRepository.findAll())
+            model.addAttribute("clubId", clubId)
+            return "events/create-form"
         }
 
         val club = clubService.findById(clubId)
@@ -110,9 +112,16 @@ class EventController(
 
         return try {
             val created = eventService.create(event)
+
             "redirect:/clubs/$clubId/events/${created.id}"
+
         } catch (e: IllegalArgumentException) {
-            "redirect:/events/create/$clubId"
+
+            model.addAttribute("error", e.message)
+            model.addAttribute("types", eventTypeRepository.findAll())
+            model.addAttribute("clubId", clubId)
+
+            "events/create-form"
         }
     }
 
@@ -149,11 +158,15 @@ class EventController(
         @PathVariable clubId: Long,
         @PathVariable id: Long,
         @Valid @ModelAttribute eventForm: EventForm,
-        bindingResult: BindingResult
+        bindingResult: BindingResult,
+        model: Model
     ): String {
 
         if (bindingResult.hasErrors()) {
-            return "redirect:/clubs/$clubId/events/$id/edit"
+            model.addAttribute("types", eventTypeRepository.findAll())
+            model.addAttribute("eventId", id)
+            model.addAttribute("clubId", clubId)
+            return "events/edit-form"
         }
 
         val club = clubService.findById(clubId)
@@ -171,9 +184,17 @@ class EventController(
 
         return try {
             eventService.update(id, updated)
+
             "redirect:/clubs/$clubId/events/$id"
+
         } catch (e: IllegalArgumentException) {
-            "redirect:/clubs/$clubId/events/$id/edit"
+
+            model.addAttribute("error", e.message)
+            model.addAttribute("types", eventTypeRepository.findAll())
+            model.addAttribute("eventId", id)
+            model.addAttribute("clubId", clubId)
+
+            "events/edit-form"
         }
     }
 

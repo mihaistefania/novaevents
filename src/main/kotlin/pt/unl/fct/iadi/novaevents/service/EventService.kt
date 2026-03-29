@@ -11,18 +11,26 @@ class EventService(
     private val eventRepository: EventRepository
 ) {
 
-    fun findAll(): List<Event> = eventRepository.findAll()
-
     fun getById(id: Long): Event =
         eventRepository.findById(id)
             .orElseThrow { NoSuchElementException("Event not found") }
 
     fun create(event: Event): Event {
+
+        if (eventRepository.existsByNameIgnoreCaseAndClub_Id(event.name, event.club.id)) {
+            throw IllegalArgumentException("An event with this name already exists")
+        }
+
         return eventRepository.save(event)
     }
 
     fun update(id: Long, updated: Event): Event {
+
         val existing = getById(id)
+
+        if (eventRepository.existsByNameIgnoreCaseAndIdNotAndClub_Id(updated.name, id, updated.club.id)) {
+            throw IllegalArgumentException("An event with this name already exists")
+        }
 
         existing.name = updated.name
         existing.date = updated.date
@@ -35,12 +43,8 @@ class EventService(
     }
 
     fun delete(id: Long) {
-        if (!eventRepository.existsById(id)) {
-            throw NoSuchElementException("Event not found")
-        }
         eventRepository.deleteById(id)
     }
-
     fun filter(
         type: EventType?,
         clubId: Long?,
