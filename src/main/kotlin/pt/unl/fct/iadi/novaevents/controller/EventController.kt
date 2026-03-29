@@ -94,7 +94,7 @@ class EventController(
         if (bindingResult.hasErrors()) {
             model.addAttribute("types", eventTypeRepository.findAll())
             model.addAttribute("clubId", clubId)
-            return "events/create-form"
+            return "redirect:/events/create-form"
         }
 
         val club = clubService.findById(clubId)
@@ -121,7 +121,7 @@ class EventController(
             model.addAttribute("types", eventTypeRepository.findAll())
             model.addAttribute("clubId", clubId)
 
-            "events/create-form"
+            "redirect:/events/create-form"
         }
     }
 
