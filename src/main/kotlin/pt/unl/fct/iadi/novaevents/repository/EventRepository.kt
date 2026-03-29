@@ -14,4 +14,6 @@ interface EventRepository : JpaRepository<Event, Long> {
     fun findByType_Id(typeId: Long): List<Event>
 
     fun findByClub_IdAndType_Id(clubId: Long, typeId: Long): List<Event>
+    fun existsByNameIgnoreCaseAndClub_Id(name: String, clubId: Long): Boolean
+    fun existsByNameIgnoreCaseAndIdNotAndClub_Id(name: String, id: Long, clubId: Long): Boolean
 }

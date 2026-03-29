@@ -19,7 +19,7 @@ class EventService(
 
     fun create(event: Event): Event {
 
-        if (eventRepository.existsByNameIgnoreCase(event.name)) {
+        if (eventRepository.existsByNameIgnoreCaseAndClub_Id(event.name, event.club.id)) {
             throw IllegalArgumentException("An event with this name already exists")
         }
 
@@ -30,7 +30,7 @@ class EventService(
 
         val existing = getById(id)
 
-        if (eventRepository.existsByNameIgnoreCaseAndIdNot(updated.name, id)) {
+        if (eventRepository.existsByNameIgnoreCaseAndIdNotAndClub_Id(updated.name, id, updated.club.id)) {
             throw IllegalArgumentException("An event with this name already exists")
         }
 
