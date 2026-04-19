@@ -25,7 +25,7 @@ class SecurityConfig(
             .sessionManagement {
                 it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             }
-
+            .securityContext { it.requireExplicitSave(false) }
             .authorizeHttpRequests {
                 it
                     .requestMatchers("/login").permitAll()
@@ -49,11 +49,9 @@ class SecurityConfig(
 
             .exceptionHandling {
                 it.authenticationEntryPoint { request, response, _ ->
-                    response.sendRedirect("/login")
+                    response.sendRedirect("http://localhost/login")
                 }
             }
-
-            .requestCache { it.disable() }
 
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter::class.java)
 

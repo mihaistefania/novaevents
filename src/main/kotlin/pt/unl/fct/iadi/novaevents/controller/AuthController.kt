@@ -38,6 +38,7 @@ class AuthController(
         val cookie = Cookie("jwt", token)
         cookie.isHttpOnly = true
         cookie.path = "/"
+        cookie.maxAge = 60 * 60 * 10
 
         response.addCookie(cookie)
 
@@ -48,8 +49,8 @@ class AuthController(
     fun logout(response: HttpServletResponse): String {
 
         val cookie = Cookie("jwt", "")
-        cookie.maxAge = 0
         cookie.path = "/"
+        cookie.maxAge = 0
 
         response.addCookie(cookie)
 

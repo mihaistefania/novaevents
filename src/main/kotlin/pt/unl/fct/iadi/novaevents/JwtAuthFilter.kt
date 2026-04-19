@@ -35,6 +35,7 @@ class JwtAuthFilter(
                     null,
                     userDetails.authorities
                 )
+                auth.isAuthenticated = true
 
                 SecurityContextHolder.getContext().authentication = auth
 

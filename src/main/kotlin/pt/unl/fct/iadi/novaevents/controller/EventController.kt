@@ -136,7 +136,7 @@ class EventController(
         }
     }
 
-    @PreAuthorize("@eventSecurity.isOwner(#id, authentication.name)")
+    @PreAuthorize("isAuthenticated() and @eventSecurity.isOwner(#id, authentication.name)")
     @GetMapping("/clubs/{clubId}/events/{id}/edit")
     fun showEditForm(
         @PathVariable clubId: Long,
