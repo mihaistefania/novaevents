@@ -20,12 +20,14 @@ class SecurityConfig(
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
 
         http
+            .securityMatcher("/**") // 🔥 ensures filter applies to ALL requests
+
             .csrf { it.disable() }
 
             .sessionManagement {
                 it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             }
-            .securityContext { it.requireExplicitSave(false) }
+
             .authorizeHttpRequests {
                 it
                     .requestMatchers("/login").permitAll()
@@ -48,7 +50,7 @@ class SecurityConfig(
             }
 
             .exceptionHandling {
-                it.authenticationEntryPoint { request, response, _ ->
+                it.authenticationEntryPoint { _, response, _ ->
                     response.sendRedirect("http://localhost/login")
                 }
             }
