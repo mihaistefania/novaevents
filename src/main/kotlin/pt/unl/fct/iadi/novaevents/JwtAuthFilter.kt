@@ -35,11 +35,13 @@ class JwtAuthFilter(
                     null,
                     userDetails.authorities
                 )
-                auth.isAuthenticated = true
 
-                SecurityContextHolder.getContext().authentication = auth
+                val context = SecurityContextHolder.createEmptyContext()
+                context.authentication = auth
+                SecurityContextHolder.setContext(context)
 
             } catch (e: Exception) {
+                // ignore invalid token
             }
         }
 
