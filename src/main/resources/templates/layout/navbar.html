@@ -1,9 +1,22 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <body>
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark"
      th:fragment="navbar">
+
+    <div xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+        <div sec:authorize="isAuthenticated()">
+            <span id="navbar-username" sec:authentication="name"></span>
+
+            <form method="post" action="/logout" style="display:inline;">
+                <button type="submit">Logout</button>
+            </form>
+        </div>
+
+    </div>
 
     <div class="container-fluid">
         <a class="navbar-brand" href="/clubs">Nova Events</a>

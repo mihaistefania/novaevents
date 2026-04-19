@@ -9,10 +9,12 @@ import org.springframework.web.bind.annotation.*
 import pt.unl.fct.iadi.novaevents.controller.dto.EventForm
 import pt.unl.fct.iadi.novaevents.model.Event
 import pt.unl.fct.iadi.novaevents.repository.EventTypeRepository
+import pt.unl.fct.iadi.novaevents.repository.UserRepository
 import pt.unl.fct.iadi.novaevents.service.ClubService
 import pt.unl.fct.iadi.novaevents.service.EventService
 import java.time.LocalDate
 import org.springframework.http.HttpStatus
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.servlet.mvc.support.RedirectAttributes
 
@@ -20,7 +22,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes
 class EventController(
     private val eventService: EventService,
     private val clubService: ClubService,
-    private val eventTypeRepository: EventTypeRepository
+    private val eventTypeRepository: EventTypeRepository,
+    private val userRepository: UserRepository
 ) {
 
     @GetMapping("/events")
@@ -104,6 +107,9 @@ class EventController(
         val club = clubService.findById(clubId)
         val type = eventTypeRepository.findById(eventForm.typeId!!).orElseThrow()
 
+        val username = SecurityContextHolder.getContext().authentication.name
+        val user = userRepository.findByUsername(username)!!
+
         val event = Event(
             id = 0,
             name = eventForm.name!!,
@@ -111,7 +117,8 @@ class EventController(
             location = eventForm.location,
             description = eventForm.description,
             club = club,
-            type = type
+            type = type,
+            owner = user // ✅ IMPORTANT
         )
 
         return try {

@@ -5,6 +5,7 @@ import pt.unl.fct.iadi.novaevents.model.Event
 import pt.unl.fct.iadi.novaevents.model.EventType
 import pt.unl.fct.iadi.novaevents.repository.EventRepository
 import java.time.LocalDate
+import org.springframework.security.access.prepost.PreAuthorize
 
 @Service
 class EventService(
@@ -24,6 +25,7 @@ class EventService(
         return eventRepository.save(event)
     }
 
+    @PreAuthorize("@eventSecurity.isOwner(#id, authentication.name)")
     fun update(id: Long, updated: Event): Event {
 
         val existing = getById(id)
@@ -42,6 +44,8 @@ class EventService(
         return eventRepository.save(existing)
     }
 
+
+    @PreAuthorize("@eventSecurity.isOwnerOrAdmin(#id, authentication.name)")
     fun delete(id: Long) {
         eventRepository.deleteById(id)
     }

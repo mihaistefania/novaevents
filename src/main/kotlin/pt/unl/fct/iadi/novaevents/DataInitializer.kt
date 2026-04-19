@@ -1,5 +1,6 @@
 package pt.unl.fct.iadi.novaevents
 
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
 import org.springframework.stereotype.Component
@@ -11,7 +12,10 @@ import java.time.LocalDate
 class DataInitializer(
     private val eventTypeRepository: EventTypeRepository,
     private val clubRepository: ClubRepository,
-    private val eventRepository: EventRepository
+    private val eventRepository: EventRepository,
+    private val userRepository: UserRepository,
+    private val roleRepository: RoleRepository,
+    private val passwordEncoder: PasswordEncoder
 ) : ApplicationRunner {
 
     override fun run(args: ApplicationArguments?) {
@@ -47,5 +51,35 @@ class DataInitializer(
 
             Event(name = "Film Night", date = LocalDate.now(), location = "Cinema", description = "Movies", club = clubs[4], type = types[3])
         ))
+
+        if (userRepository.count() == 0L) {
+
+            val alice = userRepository.save(
+                User(
+                    username = "alice",
+                    password = passwordEncoder.encode("password123")
+                )
+            )
+
+            val bob = userRepository.save(
+                User(
+                    username = "bob",
+                    password = passwordEncoder.encode("password123")
+                )
+            )
+
+            val charlie = userRepository.save(
+                User(
+                    username = "charlie",
+                    password = passwordEncoder.encode("password123")
+                )
+            )
+
+            roleRepository.saveAll(listOf(
+                Role(name = "ROLE_EDITOR", user = alice),
+                Role(name = "ROLE_EDITOR", user = bob),
+                Role(name = "ROLE_ADMIN", user = charlie)
+            ))
+        }
     }
 }
