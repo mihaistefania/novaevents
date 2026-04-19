@@ -43,6 +43,18 @@ class SecurityConfig(
                     .anyRequest().authenticated()
             }
 
+            .formLogin {
+                it.loginPage("/login").permitAll()
+            }
+
+            .exceptionHandling {
+                it.authenticationEntryPoint { request, response, _ ->
+                    response.sendRedirect("/login")
+                }
+            }
+
+            .requestCache { it.disable() }
+
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter::class.java)
 
         return http.build()

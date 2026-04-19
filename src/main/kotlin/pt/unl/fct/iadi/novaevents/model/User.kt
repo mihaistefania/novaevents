@@ -12,17 +12,17 @@ import jakarta.persistence.Table
 
 @Entity
 @Table(name = "users")
-class User(
+open class User(
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
+    open var id: Long = 0,
 
     @Column(unique = true)
-    val username: String,
+    open var username: String = "",
 
-    val password: String,
+    open var password: String = "",
 
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
-    val roles: MutableList<Role> = mutableListOf()
+    open var roles: MutableList<Role> = mutableListOf()
 )

@@ -14,6 +14,7 @@ import pt.unl.fct.iadi.novaevents.service.ClubService
 import pt.unl.fct.iadi.novaevents.service.EventService
 import java.time.LocalDate
 import org.springframework.http.HttpStatus
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.servlet.mvc.support.RedirectAttributes
@@ -118,12 +119,12 @@ class EventController(
             description = eventForm.description,
             club = club,
             type = type,
-            owner = user // ✅ IMPORTANT
+            owner = user
         )
 
         return try {
             val created = eventService.create(event)
-            "redirect:/clubs/$clubId/events/${created.id}"
+            "redirect:/clubs/$clubId"
         } catch (e: IllegalArgumentException) {
 
             bindingResult.rejectValue("name", "error.name", e.message!!)
@@ -135,6 +136,7 @@ class EventController(
         }
     }
 
+    @PreAuthorize("@eventSecurity.isOwner(#id, authentication.name)")
     @GetMapping("/clubs/{clubId}/events/{id}/edit")
     fun showEditForm(
         @PathVariable clubId: Long,
@@ -195,7 +197,7 @@ class EventController(
 
         return try {
             eventService.update(id, updated)
-            "redirect:/clubs/$clubId/events/$id"
+            "redirect:/clubs/$clubId"
         } catch (e: IllegalArgumentException) {
 
             bindingResult.rejectValue("name", "error.name", e.message!!)
