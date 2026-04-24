@@ -96,13 +96,12 @@ class EventController(
         model: Model
     ): String {
 
+        val club = clubService.findById(clubId)
+
         if (eventForm.typeId == null) {
             bindingResult.rejectValue("typeId", "error.typeId", "Event type is required")
         }
 
-        val club = clubService.findById(clubId)
-
-        // ✅ NEW BUSINESS RULE
         if (club.name == "Hiking & Outdoors Club") {
 
             if (eventForm.location.isNullOrBlank()) {

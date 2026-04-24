@@ -21,10 +21,13 @@ class WeatherClient(
                     location, apiKey
                 )
                 .retrieve()
-                .body(WeatherResponse::class.java)
+                .body(Map::class.java) as? Map<*, *>
                 ?: return null
 
-            val main = response.weather.firstOrNull()?.main ?: return null
+            val weatherList = response["weather"] as? List<*> ?: return null
+            val first = weatherList.firstOrNull() as? Map<*, *> ?: return null
+
+            val main = first["main"] as? String ?: return null
 
             main.equals("Rain", ignoreCase = true)
 

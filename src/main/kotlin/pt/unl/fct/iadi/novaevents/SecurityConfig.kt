@@ -45,7 +45,6 @@ class SecurityConfig(
             .securityMatcher("/**")
 
             .csrf { it.disable() }
-
             .sessionManagement {
                 it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             }
@@ -67,13 +66,11 @@ class SecurityConfig(
                     .anyRequest().authenticated()
             }
 
-            .formLogin {
-                it.loginPage("/login").permitAll()
-            }
+            .formLogin { it.disable() }
 
             .exceptionHandling {
                 it.authenticationEntryPoint { _, response, _ ->
-                    response.sendRedirect("http://localhost/login")
+                    response.status = 401
                 }
             }
 
