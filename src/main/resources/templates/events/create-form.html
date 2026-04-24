@@ -1,7 +1,10 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:hx="http://www.w3.org/1999/xhtml">
 <head>
     <title>Create Event</title>
+
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
 </head>
 <body>
 
@@ -48,8 +51,30 @@
 
         <br>
 
-        <div th:if="${error}">
-            <span th:text="${error}"></span>
+        <div>
+            Location:
+            <input type="text" id="location" th:field="*{location}"/>
+
+            <span th:if="${#fields.hasErrors('location')}"
+                  th:errors="*{location}"></span>
+
+            <br><br>
+
+            <button type="button" onclick="checkWeatherJS()">
+                Check Weather JS
+            </button>
+
+            <button type="button"
+                    hx-get="/api/weather"
+                    hx-target="#weatherResult"
+                    hx-include="[name='location']">
+                Check Weather HTMX
+            </button>
+
+            <br><br>
+
+            <div id="weatherResult"></div>
+
         </div>
 
         <br>
@@ -59,6 +84,36 @@
     </form>
 
 </div>
+
+<script>
+    function checkWeatherJS() {
+        const location = document.getElementById("location").value;
+
+        fetch(`/api/weather?location=${location}`, {
+            headers: {
+                "Accept": "application/json"
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+
+            const div = document.getElementById("weatherResult");
+
+            if (data.raining === true) {
+                div.innerHTML = '<span class="badge bg-warning text-dark">Raining</span>';
+            } else if (data.raining === false) {
+                div.innerHTML = '<span class="badge bg-success">Clear</span>';
+            } else {
+                div.innerHTML = '<span class="text-secondary">Weather data unavailable.</span>';
+            }
+
+        })
+        .catch(() => {
+            document.getElementById("weatherResult").innerHTML =
+                '<span class="text-secondary">Error fetching weather</span>';
+        });
+    }
+</script>
 
 </body>
 </html>

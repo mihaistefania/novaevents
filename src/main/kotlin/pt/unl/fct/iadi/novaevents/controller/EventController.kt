@@ -12,19 +12,20 @@ import pt.unl.fct.iadi.novaevents.repository.EventTypeRepository
 import pt.unl.fct.iadi.novaevents.repository.UserRepository
 import pt.unl.fct.iadi.novaevents.service.ClubService
 import pt.unl.fct.iadi.novaevents.service.EventService
+import pt.unl.fct.iadi.novaevents.service.WeatherService
 import java.time.LocalDate
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.server.ResponseStatusException
-import org.springframework.web.servlet.mvc.support.RedirectAttributes
 
 @Controller
 class EventController(
     private val eventService: EventService,
     private val clubService: ClubService,
     private val eventTypeRepository: EventTypeRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val weatherService: WeatherService // ✅ NEW
 ) {
 
     @GetMapping("/events")
@@ -99,13 +100,36 @@ class EventController(
             bindingResult.rejectValue("typeId", "error.typeId", "Event type is required")
         }
 
+        val club = clubService.findById(clubId)
+
+        // ✅ NEW BUSINESS RULE
+        if (club.name == "Hiking & Outdoors Club") {
+
+            if (eventForm.location.isNullOrBlank()) {
+                bindingResult.rejectValue(
+                    "location",
+                    "",
+                    "Location is required for outdoor events"
+                )
+            } else {
+                val raining = weatherService.isRaining(eventForm.location!!)
+
+                if (raining == true) {
+                    bindingResult.rejectValue(
+                        "location",
+                        "",
+                        "It is currently raining at \"${eventForm.location}\" — outdoor events cannot be created in bad weather"
+                    )
+                }
+            }
+        }
+
         if (bindingResult.hasErrors()) {
             model.addAttribute("types", eventTypeRepository.findAll())
             model.addAttribute("clubId", clubId)
             return "events/create-form"
         }
 
-        val club = clubService.findById(clubId)
         val type = eventTypeRepository.findById(eventForm.typeId!!).orElseThrow()
 
         val username = SecurityContextHolder.getContext().authentication.name
@@ -123,7 +147,7 @@ class EventController(
         )
 
         return try {
-            val created = eventService.create(event)
+            eventService.create(event)
             "redirect:/clubs/$clubId"
         } catch (e: IllegalArgumentException) {
 
@@ -220,6 +244,7 @@ class EventController(
 
         return "redirect:/clubs/$clubId"
     }
+
     @GetMapping("/clubs/{clubId}/events/{id}")
     fun detailFromClub(
         @PathVariable clubId: Long,

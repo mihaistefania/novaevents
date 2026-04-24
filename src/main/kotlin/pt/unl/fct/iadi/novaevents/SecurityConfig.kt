@@ -1,4 +1,5 @@
 package pt.unl.fct.iadi.novaevents
+
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
@@ -17,10 +18,31 @@ class SecurityConfig(
 ) {
 
     @Bean
-    fun filterChain(http: HttpSecurity): SecurityFilterChain {
+    fun apiFilterChain(http: HttpSecurity): SecurityFilterChain {
 
         http
-            .securityMatcher("/**") // 🔥 ensures filter applies to ALL requests
+            .securityMatcher("/api/**")
+
+            .csrf { it.disable() }
+
+            .sessionManagement {
+                it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            }
+
+            .authorizeHttpRequests {
+                it.anyRequest().authenticated()
+            }
+
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter::class.java)
+
+        return http.build()
+    }
+
+    @Bean
+    fun webFilterChain(http: HttpSecurity): SecurityFilterChain {
+
+        http
+            .securityMatcher("/**")
 
             .csrf { it.disable() }
 
