@@ -1,16 +1,16 @@
 package pt.unl.fct.iadi.novaevents
+
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.*
+import org.mockito.Mockito.*
 import pt.unl.fct.iadi.novaevents.model.*
 import pt.unl.fct.iadi.novaevents.repository.EventRepository
 import pt.unl.fct.iadi.novaevents.service.EventService
-import java.time.LocalDate
 import java.util.*
 
 class TestEventService {
 
-    private val repo: EventRepository = mock()
+    private val repo: EventRepository = mock(EventRepository::class.java)
     private val service = EventService(repo)
 
     private val club = Club(id = 1, name = "Test Club")
@@ -20,8 +20,8 @@ class TestEventService {
     fun `create event success`() {
         val event = Event(name = "Test", club = club, type = type)
 
-        whenever(repo.existsByNameIgnoreCaseAndClub_Id("Test", 1)).thenReturn(false)
-        whenever(repo.save(event)).thenReturn(event)
+        `when`(repo.existsByNameIgnoreCaseAndClub_Id("Test", 1)).thenReturn(false)
+        `when`(repo.save(event)).thenReturn(event)
 
         val result = service.create(event)
 
@@ -32,7 +32,7 @@ class TestEventService {
     fun `create duplicate event throws`() {
         val event = Event(name = "Test", club = club, type = type)
 
-        whenever(repo.existsByNameIgnoreCaseAndClub_Id("Test", 1)).thenReturn(true)
+        `when`(repo.existsByNameIgnoreCaseAndClub_Id("Test", 1)).thenReturn(true)
 
         assertThrows(IllegalArgumentException::class.java) {
             service.create(event)
@@ -43,9 +43,9 @@ class TestEventService {
     fun `update event success`() {
         val existing = Event(id = 1, name = "Old", club = club, type = type)
 
-        whenever(repo.findById(1)).thenReturn(Optional.of(existing))
-        whenever(repo.existsByNameIgnoreCaseAndIdNotAndClub_Id("New", 1, 1)).thenReturn(false)
-        whenever(repo.save(any())).thenReturn(existing)
+        `when`(repo.findById(1)).thenReturn(Optional.of(existing))
+        `when`(repo.existsByNameIgnoreCaseAndIdNotAndClub_Id("New", 1, 1)).thenReturn(false)
+        `when`(repo.save(any())).thenReturn(existing)
 
         val updated = Event(id = 1, name = "New", club = club, type = type)
 
@@ -56,7 +56,7 @@ class TestEventService {
 
     @Test
     fun `filter by club`() {
-        whenever(repo.findByClub_Id(1)).thenReturn(listOf(
+        `when`(repo.findByClub_Id(1)).thenReturn(listOf(
             Event(name = "E1", club = club, type = type)
         ))
 

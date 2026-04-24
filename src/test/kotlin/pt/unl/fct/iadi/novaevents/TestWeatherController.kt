@@ -1,7 +1,7 @@
 package pt.unl.fct.iadi.novaevents
 
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.whenever
+import org.mockito.Mockito.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
@@ -22,7 +22,7 @@ class TestWeatherController {
     @Test
     fun `returns JSON response`() {
 
-        whenever(weatherService.isRaining("Lisbon")).thenReturn(true)
+        `when`(weatherService.isRaining("Lisbon")).thenReturn(true)
 
         mockMvc.get("/api/weather?location=Lisbon") {
             accept = org.springframework.http.MediaType.APPLICATION_JSON
