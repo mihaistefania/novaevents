@@ -9,6 +9,10 @@ class WeatherService(
 ) {
 
     fun isRaining(location: String): Boolean? {
-        return weatherClient.isRaining(location)
+        return try {
+            weatherClient.isRaining(location)
+        } catch (e: Exception) {
+            null
+        }
     }
 }

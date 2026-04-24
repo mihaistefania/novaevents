@@ -11,18 +11,25 @@ class WeatherClient(
 ) {
 
     fun isRaining(location: String): Boolean? {
+        return try {
 
-        val client = restClientBuilder.build()
+            val client = restClientBuilder.build()
 
-        val response = client.get()
-            .uri("https://api.openweathermap.org/data/2.5/weather?q={loc}&appid={key}",
-                location, apiKey)
-            .retrieve()
-            .body(WeatherResponse::class.java)
-            ?: return null
+            val response = client.get()
+                .uri(
+                    "https://api.openweathermap.org/data/2.5/weather?q={loc}&appid={key}",
+                    location, apiKey
+                )
+                .retrieve()
+                .body(WeatherResponse::class.java)
+                ?: return null
 
-        val main = response.weather.firstOrNull()?.main ?: return null
+            val main = response.weather.firstOrNull()?.main ?: return null
 
-        return main.equals("Rain", ignoreCase = true)
+            main.equals("Rain", ignoreCase = true)
+
+        } catch (e: Exception) {
+            null
+        }
     }
 }
